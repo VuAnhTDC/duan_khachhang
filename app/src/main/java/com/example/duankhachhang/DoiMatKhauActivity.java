@@ -27,48 +27,12 @@ public class DoiMatKhauActivity extends AppCompatActivity {
     }
 
     private void setEvent() {
-        ted_matKhauMoi.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                validatePassNew(charSequence.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
         btn_xacnhan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
             }
         });
-    }
-    private void validatePassNew(String str){
-        if (str.length() < 6){
-            til_matKhauMoi.setError("không được nhập dưới 6 kí tự");
-            til_matKhauMoi.setErrorIconDrawable(R.drawable.error);
-
-        }else if(TextUtils.isEmpty(str)){
-            til_matKhauMoi.setError("chưa nhập số điện thoại");
-        }
-    }
-    private void showEmptyPassDialog(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setIcon(R.drawable.ic_erorr);
-        builder.setTitle("Thông Báo Lỗi");
-        builder.setMessage("chưa nhập dữ liệu");
-        builder.setPositiveButton("OK",(dialog,which) -> {
-            dialog.dismiss();
-        });
-        AlertDialog dialog = builder.create();
-        dialog.show();
     }
     private void setControl() {
         til_matKhauMoi = findViewById(R.id.til_matKhauMoi);

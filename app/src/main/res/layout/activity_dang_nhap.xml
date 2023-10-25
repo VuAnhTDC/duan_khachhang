@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#CCF8D0"
     tools:context=".DangNhapActivity">
 
     <androidx.core.widget.NestedScrollView
@@ -30,6 +29,8 @@
                app:errorEnabled="true"
                app:helperText="Nhập số điện thoại Việt Nam (+84)"
                android:layout_marginTop="30dp"
+               android:layout_marginLeft="20dp"
+               android:layout_marginRight="20dp"
                android:layout_width="match_parent"
                android:layout_height="wrap_content">
 
@@ -54,6 +55,8 @@
                app:errorEnabled="true"
                android:layout_width="match_parent"
                android:layout_marginTop="2dp"
+               android:layout_marginLeft="20dp"
+               android:layout_marginRight="20dp"
                android:hint="Mật khẩu"
                android:layout_height="wrap_content">
                <com.google.android.material.textfield.TextInputEditText

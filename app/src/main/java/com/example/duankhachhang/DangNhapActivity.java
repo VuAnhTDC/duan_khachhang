@@ -1,5 +1,6 @@
 package com.example.duankhachhang;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,9 +12,15 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class DangNhapActivity extends AppCompatActivity {
 
@@ -21,6 +28,7 @@ public class DangNhapActivity extends AppCompatActivity {
     TextInputEditText ted_soDienThoai, ted_matKhau;
     Button btn_xacNhan, btn_dangKy;
     TextView tv_quenMatKhau;
+    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://duandd2-default-rtdb.asia-southeast1.firebasedatabase.app");
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,7 +46,7 @@ public class DangNhapActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                validatePhoneNumber(charSequence.toString());
+
             }
 
             @Override
@@ -50,8 +58,35 @@ public class DangNhapActivity extends AppCompatActivity {
         btn_xacNhan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!isInputPhoneVali() && isInputPassVali())  showEmptyPhoneDialog();
-                if (isInputPhoneVali() && !isInputPassVali() ) showEmptyPassDialog();
+                final String soDT = ted_soDienThoai.getText().toString();
+                final String matKhau = ted_matKhau.getText().toString();
+
+                if (soDT.isEmpty() || matKhau.isEmpty()){
+                    Toast.makeText(DangNhapActivity.this, "bạn chưa nhập đủ thông tin", Toast.LENGTH_SHORT).show();
+                }else {
+                    databaseReference.child("userKhachHang").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.hasChild(soDT)){
+                                final String getPass = snapshot.child(soDT).child("pass").getValue(String.class);
+                                if (matKhau.equals(getPass)){
+                                    Toast.makeText(DangNhapActivity.this, "đăng nhập thành công", Toast.LENGTH_SHORT).show();
+                                    startActivity(new Intent(DangNhapActivity.this,MainActivity.class));
+                                    finish();
+                                }else {
+                                    Toast.makeText(DangNhapActivity.this, "đăng nhập thất bại", Toast.LENGTH_SHORT).show();
+                                }
+                            }else {
+                                Toast.makeText(DangNhapActivity.this, "sai mật khẩu", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }
             }
         });
         btn_dangKy.setOnClickListener(new View.OnClickListener() {
@@ -67,45 +102,6 @@ public class DangNhapActivity extends AppCompatActivity {
     public void onForgotPasswordClick(View view) {
         Intent intent = new Intent(this, QuenMatKhauActivity.class);
         startActivity(intent);
-    }
-    private boolean isInputPhoneVali() {
-        String phone = ted_soDienThoai.getText().toString().trim();
-        return TextUtils.isEmpty(phone) || phone.length() > 10;
-    }
-    private boolean isInputPassVali() {
-        String pass = ted_matKhau.getText().toString().trim();
-        return TextUtils.isEmpty(pass) || pass.length() < 6 ;
-    }
-
-    private void showEmptyPhoneDialog(){
-        AlertDialog.Builder build = new AlertDialog.Builder(this);
-        build.setTitle("Thông Báo");
-        build.setIcon(R.drawable.ic_erorr);
-        build.setMessage("bạn chưa nhập mật khẩu");
-        build.setPositiveButton("OK", (dialog,which) -> {
-            dialog.dismiss();
-        });
-        AlertDialog dialog = build.create();
-        dialog.show();
-    }
-    private void showEmptyPassDialog(){
-        AlertDialog.Builder build = new AlertDialog.Builder(this);
-        build.setTitle("Thông Báo");
-        build.setIcon(R.drawable.ic_erorr);
-        build.setMessage("bạn chưa nhập số điện thoại");
-        build.setPositiveButton("OK", (dialog,which) -> {
-           dialog.dismiss();
-        });
-        AlertDialog dialog = build.create();
-        dialog.show();
-    }
-
-    private void validatePhoneNumber(String phone){
-        if ( phone.length() > 10 ){
-            til_soDienThoai.setError("vượt quá 10 sô");
-        }else if(TextUtils.isEmpty(phone)) {
-            til_soDienThoai.setError("chưa nhập số điện thoại");
-        }
     }
 
     private void setControll() {

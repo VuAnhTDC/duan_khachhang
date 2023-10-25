@@ -1,29 +1,11 @@
 {
   "project_info": {
     "project_number": "728509691934",
+    "firebase_url": "https://duandd2-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "duandd2",
     "storage_bucket": "duandd2.appspot.com"
   },
   "client": [
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:728509691934:android:6c5b2eba5022d5362f560f",
-        "android_client_info": {
-          "package_name": "com.example.duan"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAN0NEkiS-AnRc6Fm1brgb0HoTRwwAMG0s"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
     {
       "client_info": {
         "mobilesdk_app_id": "1:728509691934:android:4b0f2f15ab64d46a2f560f",
@@ -45,7 +27,26 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:728509691934:android:8344ce96de3f366d2f560f",
+        "mobilesdk_app_id": "1:728509691934:android:6c783afae5b495df2f560f",
+        "android_client_info": {
+          "package_name": "com.example.duangiaohang"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAN0NEkiS-AnRc6Fm1brgb0HoTRwwAMG0s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:728509691934:android:12b499d514b1fe022f560f",
         "android_client_info": {
           "package_name": "com.example.duankhachhang"
         }

@@ -1,5 +1,6 @@
 package com.example.duankhachhang;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -8,17 +9,32 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.FirebaseException;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthOptions;
+import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.concurrent.TimeUnit;
 
 public class QuenMatKhauActivity extends AppCompatActivity {
 
     TextInputLayout til_soDienThoai,til_OTP;
     TextInputEditText ted_soDienThoai,ted_OTP;
     Button btn_xacNhan;
+    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReferenceFromUrl("https://duandd2-default-rtdb.asia-southeast1.firebasedatabase.app");
+    FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
+    private String idSMS = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,27 +44,42 @@ public class QuenMatKhauActivity extends AppCompatActivity {
         setEven();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
     private void setEven() {
-        ted_soDienThoai.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                validatePhoneNumber(charSequence.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
         til_soDienThoai.setEndIconOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                inputPhoneValid();
+                final String soDT = ted_soDienThoai.getText().toString().trim();
+
+                PhoneAuthOptions options =
+                        PhoneAuthOptions.newBuilder(mAuth)
+                                .setPhoneNumber("+84" + soDT.substring(1))
+                                .setTimeout(60L, TimeUnit.SECONDS)
+                                .setActivity(QuenMatKhauActivity.this)
+                                .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
+                                    @Override
+                                    public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
+                                        Toast.makeText(QuenMatKhauActivity.this, "mã đang được gửi tới ", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @Override
+                                    public void onVerificationFailed(@NonNull FirebaseException e) {
+                                        Toast.makeText(QuenMatKhauActivity.this, "đã xảy ra lỗi trong quá trình gửi mã ", Toast.LENGTH_SHORT).show();
+                                        Log.e("Error", e.getMessage());
+                                    }
+
+                                    @Override
+                                    public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
+                                        super.onCodeSent(s, forceResendingToken);
+                                        idSMS = s;
+                                    }
+                                })
+                                .build();
+                PhoneAuthProvider.verifyPhoneNumber(options);
             }
         });
         btn_xacNhan.setOnClickListener(new View.OnClickListener() {
@@ -58,46 +89,6 @@ public class QuenMatKhauActivity extends AppCompatActivity {
                 startActivity(new Intent(QuenMatKhauActivity.this, DoiMatKhauActivity.class));
             }
         });
-    }
-
-    private void inputPhoneValid() {
-        String phone = ted_soDienThoai.getText().toString().trim();
-        if (TextUtils.isEmpty(phone)){
-            showEmptyPhoneDialog();
-        }else if(phone.length() > 10){
-            showErorrPhoneDialog();
-        }
-    }
-
-    private void validatePhoneNumber(String phone){
-        if (phone.length() > 10){
-            til_soDienThoai.setError("nhập hơn 10 số");
-        }else if(TextUtils.isEmpty(phone)){
-            til_soDienThoai.setError("chưa nhập số điện thoại");
-        }
-    }
-
-    private void showEmptyPhoneDialog(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setIcon(R.drawable.ic_erorr);
-        builder.setTitle("Thông Báo Lỗi");
-        builder.setMessage("chưa nhập số điện thoại");
-        builder.setPositiveButton("OK",(dialog,which) -> {
-           dialog.dismiss();
-        });
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-    private void showErorrPhoneDialog(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setIcon(R.drawable.ic_erorr);
-        builder.setTitle("Thông Báo Lỗi");
-        builder.setMessage("nhập hơn 10 số điện thoại");
-        builder.setPositiveButton("OK",(dialog,which) -> {
-            dialog.dismiss();
-        });
-        AlertDialog dialog = builder.create();
-        dialog.show();
     }
 
     private void setControl() {
