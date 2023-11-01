@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DangNhapActivity">
+    tools:context=".Activites.DangNhapActivity">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -23,7 +23,7 @@
                android:textSize="40sp"
                android:layout_gravity="center"/>
            <com.google.android.material.textfield.TextInputLayout
-               android:id="@+id/til_soDienThoai"
+               android:id="@+id/til_soDienThoai_login"
                app:startIconDrawable="@drawable/ic_phone"
                app:helperTextEnabled="true"
                app:errorEnabled="true"
@@ -39,51 +39,44 @@
                    android:layout_height="wrap_content"
                    android:inputType="phone"
                    android:background="@drawable/edit_text"
-                   android:hint="  Số Điện Thoại"
+                   android:hint="Số Điện Thoại"
+                   android:maxLines="1"
                    android:padding="16dp"
                    android:textSize="16sp"
                    android:textColor="@color/edit_text_color"
-                   android:id="@+id/edt_soDienThoai" />
+                   android:id="@+id/edt_soDienThoai_login" />
            </com.google.android.material.textfield.TextInputLayout>
+           <Button
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:id="@+id/btn_gui_login"
+               android:layout_marginLeft="20dp"
+               android:layout_marginRight="20dp"
+               android:text="gửi"
+               android:layout_gravity="center"
+               android:textStyle="bold"
+               android:background="@drawable/button"/>
 
            <com.google.android.material.textfield.TextInputLayout
-               android:id="@+id/til_matKhau"
+               android:id="@+id/til_OTP_Login"
                app:startIconDrawable="@drawable/ic_lock"
-               app:helperTextEnabled="true"
-               app:boxStrokeErrorColor="?attr/colorError"
-               app:endIconMode="password_toggle"
-               app:errorEnabled="true"
                android:layout_width="match_parent"
                android:layout_marginTop="2dp"
                android:layout_marginLeft="20dp"
                android:layout_marginRight="20dp"
-               android:hint="Mật khẩu"
+               android:hint="mã OTP"
                android:layout_height="wrap_content">
                <com.google.android.material.textfield.TextInputEditText
                    android:layout_width="match_parent"
                    android:layout_height="wrap_content"
                    android:background="@drawable/edit_text"
                    android:drawableStart="@drawable/ic_lock"
-                   app:errorEnabled="true"
-                   android:inputType="textPassword"
+                   android:maxLines="1"
                    android:padding="16dp"
                    android:textSize="16sp"
                    android:textColor="@color/edit_text_color"
-                   android:id="@+id/edt_matKhau" />
+                   android:id="@+id/edt_OTP_login" />
            </com.google.android.material.textfield.TextInputLayout>
-
-           <TextView
-               android:id="@+id/tv_quenMatKhau"
-               android:layout_width="wrap_content"
-               android:layout_height="wrap_content"
-               android:layout_marginTop="20dp"
-               android:text="Quên Mật Khẩu"
-               android:layout_marginLeft="5dp"
-               android:textStyle="italic"
-               android:textSize="15sp"
-               android:clickable="false"
-               android:onClick="onForgotPasswordClick"
-               android:textColor="#0A2C83"/>
            <View
                android:layout_width="380dp"
                android:layout_height="1dp"
@@ -95,7 +88,7 @@
            <Button
                android:layout_width="match_parent"
                android:layout_height="wrap_content"
-               android:id="@+id/btn_xacNhan_DangNhap"
+               android:id="@+id/btn_xacNhan_login"
                android:layout_marginLeft="20dp"
                android:layout_marginRight="20dp"
                android:text="Xác Nhận"
@@ -110,14 +103,16 @@
                android:background="@drawable/line"
                />
            <Button
-               android:layout_width="match_parent"
+               android:layout_width="wrap_content"
                android:layout_height="wrap_content"
-               android:id="@+id/btn_dangKy"
+               android:id="@+id/btn_resend_login"
                android:layout_marginLeft="20dp"
                android:layout_marginRight="20dp"
-               android:text="Đăng Ký"
+               android:text="gửi lại mã"
+               android:layout_gravity="center"
                android:textStyle="bold"
                android:background="@drawable/button"/>
+
        </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

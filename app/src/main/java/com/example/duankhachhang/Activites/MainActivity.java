@@ -1,8 +1,10 @@
-package com.example.duankhachhang;
+package com.example.duankhachhang.Activites;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.example.duankhachhang.R;
 
 public class MainActivity extends AppCompatActivity {
 

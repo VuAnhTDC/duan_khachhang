@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Activites.NhapThongTinActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Điền Thông Tin"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:textSize="40sp"
+                android:gravity="center"
+                android:layout_marginTop="60dp"/>
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_soDienThoai_userDetail"
+                app:startIconDrawable="@drawable/ic_phone"
+                android:layout_marginTop="30dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="phone"
+                    android:background="@drawable/edit_text_background"
+                    android:hint="Số Điện Thoại"
+                    android:maxLines="1"
+                    android:padding="16dp"
+                    android:textSize="16sp"
+                    android:textColor="@color/edit_text_color"
+                    android:id="@+id/edt_soDienThoai_userDetail" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_HoTen_userDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="20dp"
+                android:hint=" nhập họ và tên"
+                app:errorIconDrawable="@drawable/error"
+                app:startIconDrawable="@drawable/ic_name">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/ted_HoTen_userDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/edit_text_background" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/til_DiaChi_userDetail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="20dp"
+                android:hint=" nhập địa chỉ nhận hàng"
+                app:boxStrokeErrorColor="?attr/colorError"
+                app:errorEnabled="true"
+                app:errorIconDrawable="@drawable/error"
+                app:helperText="Lưu Ý: nhập đúng địa chỉ nhận hàng"
+                app:helperTextTextColor="#C80202"
+                app:startIconDrawable="@drawable/id_location">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/ted_DiaChi_userDetail"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/edit_text_background" />
+            </com.google.android.material.textfield.TextInputLayout>
+            <View
+                android:layout_width="380dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="10dp"
+                android:layout_gravity="center"
+                android:background="@drawable/line"
+                />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/btn_xacNhan_UserDetail"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:text="Xác Nhận"
+                android:textStyle="bold"
+                android:background="@drawable/button"/>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
