@@ -4,7 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -14,6 +16,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.duankhachhang.Class.Customer;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DataSnapshot;
@@ -21,6 +24,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+
+import java.net.Inet4Address;
 
 public class DangNhapActivity extends AppCompatActivity {
 
@@ -67,17 +73,28 @@ public class DangNhapActivity extends AppCompatActivity {
                     databaseReference.child("userKhachHang").addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if (snapshot.hasChild(soDT)){
-                                final String getPass = snapshot.child(soDT).child("pass").getValue(String.class);
-                                if (matKhau.equals(getPass)){
-                                    Toast.makeText(DangNhapActivity.this, "đăng nhập thành công", Toast.LENGTH_SHORT).show();
-                                    startActivity(new Intent(DangNhapActivity.this,MainActivity.class));
-                                    finish();
-                                }else {
-                                    Toast.makeText(DangNhapActivity.this, "đăng nhập thất bại", Toast.LENGTH_SHORT).show();
+                            if (snapshot.exists()){
+                                for (DataSnapshot customerItem:
+                                     snapshot.getChildren()) {
+                                    if (snapshot.hasChild(soDT)){
+                                        final String getPass = snapshot.child(soDT).child("pass").getValue(String.class);
+                                        if (matKhau.equals(getPass)){
+                                            Customer customer = customerItem.getValue(Customer.class);
+                                            SharedPreferences sharedPreferences1 = getSharedPreferences("InformationShop", Context.MODE_PRIVATE);
+                                            Gson gson = new Gson();
+                                            String json = gson.toJson(customerItem);
+                                            SharedPreferences.Editor editor = sharedPreferences1.edit();
+                                            editor.putString("informationCustomer", json);
+                                            editor.apply();
+                                            startActivity(new Intent(DangNhapActivity.this,MainActivity.class).putExtra("informationCustomer",customer));
+                                            finish();
+                                        }else {
+                                            Toast.makeText(DangNhapActivity.this, "đăng nhập thất bại", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }else {
+                                        Toast.makeText(DangNhapActivity.this, "sai mật khẩu", Toast.LENGTH_SHORT).show();
+                                    }
                                 }
-                            }else {
-                                Toast.makeText(DangNhapActivity.this, "sai mật khẩu", Toast.LENGTH_SHORT).show();
                             }
                         }
 

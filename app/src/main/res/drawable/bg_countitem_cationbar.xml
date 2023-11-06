@@ -1,0 +1,14 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Outer circle background -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#FF0000" /> <!-- Màu nền cho vòng tròn -->
+        </shape>
+    </item>
+    <!-- Inner circle background to make it smaller -->
+    <item android:top="4dp" android:left="4dp" android:right="4dp" android:bottom="4dp">
+        <shape android:shape="oval">
+            <solid android:color="#FFFFFF" /> <!-- Màu nền cho vòng tròn nhỏ hơn -->
+        </shape>
+    </item>
+</layer-list>

@@ -46,4 +46,8 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-database")
     implementation("com.google.firebase:firebase-auth")
+    implementation ("com.google.code.gson:gson:2.8.7")
+    implementation("com.squareup.picasso:picasso:2.8")
+    implementation ("com.github.bumptech.glide:glide:4.12.0")
+    implementation ("de.hdodenhof:circleimageview:3.1.0")
 }
