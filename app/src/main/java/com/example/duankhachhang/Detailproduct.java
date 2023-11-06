@@ -15,32 +15,27 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.request.target.Target;
 import com.example.duankhachhang.Adapter.ProductBanerAdapter;
-import com.example.duankhachhang.Class.Category;
 import com.example.duankhachhang.Class.Customer;
 import com.example.duankhachhang.Class.Image;
 import com.example.duankhachhang.Class.LikeProductData;
-import com.example.duankhachhang.Class.Manuface;
+import com.example.duankhachhang.Class.OrderData;
 import com.example.duankhachhang.Class.ProductData;
 import com.example.duankhachhang.Dialog.CommentProductDialogFragment;
-import com.example.duankhachhang.RecyclerView.UriImageFirebase_ViewHolder;
-import com.example.duankhachhang.RecyclerView.UrlImageFirebase_Adapter;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Detailproduct extends AppCompatActivity {
     Context context;
@@ -239,6 +234,20 @@ public class Detailproduct extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+            }
+        });
+
+        btnBuyProduct_DetailProduct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ArrayList<OrderData> arrOrder = new ArrayList<>();
+                Date date = new Date();
+                int priceOrder = productData.getPriceProduct() * 1;
+                OrderData orderData = new OrderData(customer.getId()+idProduct,customer.getId(),idProduct,productData.getIdUserProduct(),"","",date.toString(),customer.getAddress(),customer.getId(),"",1,priceOrder);
+                arrOrder.add(orderData);
+                Intent intent = new Intent(context, Buyproduct.class);
+                intent.putExtra("arrOrder", arrOrder);
+                startActivity(intent);
             }
         });
 

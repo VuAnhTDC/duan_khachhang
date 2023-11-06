@@ -18,7 +18,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="file:/$USER_HOME$/AppData/Local/Android/Sdk/icons/material/materialicons/star/baseline_star_24.xml" />
+                                      <entry key="url" value="file:/$USER_HOME$/AppData/Local/Android/Sdk/icons/material/materialicons/edit/baseline_edit_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -28,8 +28,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="b7ee00" />
-                            <entry key="outputName" value="icon_star" />
+                            <entry key="color" value="020202" />
+                            <entry key="outputName" value="icon_edit" />
                             <entry key="sourceFile" value="C:\Users\Admin\Documents\GitHub\duan_khachhang" />
                           </map>
                         </option>
