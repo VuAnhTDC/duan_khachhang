@@ -3,13 +3,16 @@ package com.example.duankhachhang.Activites;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.duankhachhang.Models.Customer;
 import com.example.duankhachhang.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -25,6 +28,13 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 
 import java.util.concurrent.TimeUnit;
 
@@ -35,6 +45,8 @@ public class DangNhapActivity extends AppCompatActivity {
     Button btn_xacNhan,btn_resendOTP,btn_gui;
     private FirebaseAuth mAuth;
     private String mVerificationId;
+    private DatabaseReference reference;
+    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
     @Override
@@ -75,6 +87,10 @@ public class DangNhapActivity extends AppCompatActivity {
                 Log.d(TAG, "Token:" + mResendToken);
             }
         };
+        setEvent();
+    }
+
+    private void setEvent() {
         btn_gui.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -85,8 +101,39 @@ public class DangNhapActivity extends AppCompatActivity {
         btn_xacNhan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                final String phone = ted_soDienThoai.getText().toString();
                 final String code = ted_OTP.getText().toString();
-                verifyPhoneNumberWithCode(mVerificationId,code);
+                if (phone.isEmpty() && code.isEmpty()){
+                    Toast.makeText(DangNhapActivity.this, "banj chưa nhập đủ thông tin", Toast.LENGTH_SHORT).show();
+                }else {
+                    reference = firebaseDatabase.getReference("Customer").child(phone);
+                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()){
+                                Customer customer = snapshot.getValue(Customer.class);
+                                System.out.println(customer.toString());
+                                if (customer.getId()==phone){
+                                    SharedPreferences shePreferences = getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
+                                    SharedPreferences.Editor edit = shePreferences.edit();
+                                    Gson gson = new Gson();
+                                    String json = gson.toJson(customer);
+                                    System.out.println(json.toString());
+                                    edit.putString("informationUserCustomer", json);
+                                    edit.apply();
+                                }
+                            }else {
+                                System.out.println("không có dữ liệu");
+                            }
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                    verifyPhoneNumberWithCode(mVerificationId,code);
+                }
+
             }
         });
         btn_resendOTP.setOnClickListener(new View.OnClickListener() {
@@ -104,6 +151,7 @@ public class DangNhapActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
     }
+
     private void startPhoneNumberVerification(String phoneNumber) {
         PhoneAuthOptions options =
                 PhoneAuthOptions.newBuilder(mAuth)
@@ -124,15 +172,13 @@ public class DangNhapActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Log.d(TAG, "signInWithCredential:thành công");
+                            Log.d(TAG, "signInWithCredential:       thành công");
                             Toast.makeText(DangNhapActivity.this, "đăng nhập thành công", Toast.LENGTH_SHORT).show();
                             FirebaseUser user = task.getResult().getUser();
-                            //updateUI(user);
+                            updateUI(user);
                         } else {
-                            Log.w(TAG, "signInWithCredential:thất bại", task.getException());
-                            if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                            Log.w(TAG, "signInWithCredential:        thất bại", task.getException());
 
-                            }
                         }
                     }
                 });
@@ -151,9 +197,14 @@ public class DangNhapActivity extends AppCompatActivity {
     }
     private void updateUI(FirebaseUser user) {
         if (user != null){
-            Intent intent = new Intent(DangNhapActivity.this,NhapThongTinActivity.class);
-            intent.putExtra("phoneUser",ted_soDienThoai.getText().toString());
-            startActivity(intent);
+            String phone = user.getPhoneNumber();
+            if (phone.equals(ted_soDienThoai.getText().toString())){
+                startActivity(new Intent(DangNhapActivity.this, HomePageMainActivity.class));
+            }else {
+                Intent intent = new Intent(DangNhapActivity.this,NhapThongTinActivity.class);
+                intent.putExtra("phone",phone);
+                startActivity(intent);
+            }
         }
     }
     private void setControll() {
