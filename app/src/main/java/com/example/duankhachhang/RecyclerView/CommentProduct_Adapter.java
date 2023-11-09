@@ -41,10 +41,13 @@ public class CommentProduct_Adapter extends RecyclerView.Adapter<CommentProduct_
     @Override
     public void onBindViewHolder(@NonNull CommentProduct_ViewHolder holder, int position) {
         CommentData commentData = arrCommentProduct.get(position);
+        System.out.println("cmt" + commentData.toString());
         setInformationUserComment(commentData,holder);
     }
 
     private void setInformationUserComment(CommentData commentData,CommentProduct_ViewHolder holder){
+        holder.tvContentCommet_ItemUserComment.setText(commentData.getContentComment());
+        holder.tvDateComment_ItemuserComment.setText(commentData.getDateComment());
         databaseReference = firebaseDatabase.getReference("Customer").child(commentData.getIdCustomer());
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -52,10 +55,8 @@ public class CommentProduct_Adapter extends RecyclerView.Adapter<CommentProduct_
                 if (snapshot.exists()){
                     Customer customer = snapshot.getValue(Customer.class);
                     holder.tvUserNameProduct_ItemUserComment.setText(customer.getName());
-                    holder.tvContentCommet_ItemUserComment.setText(commentData.getContentComment());
-                    holder.tvDateComment_ItemuserComment.setText(commentData.getDateComment());
                     if (!customer.getImageUser().isEmpty()){
-                        Picasso.get().load(customer.getImageUser()).into(holder.ivAvataUserComment_ItemUserComment);
+                        Picasso.get().load(customer.getImageUser()).placeholder(R.drawable.icon_personal).into(holder.ivAvataUserComment_ItemUserComment);
                     }
                     else {
                         holder.ivAvataUserComment_ItemUserComment.setImageResource(R.drawable.icon_personal);

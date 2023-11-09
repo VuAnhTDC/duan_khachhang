@@ -32,6 +32,7 @@ public class CommentProductDialogFragment extends DialogFragment {
     RecyclerView rcvListCommentProduct_CommentProduct;
     CommentProduct_Adapter commentProductAdapter;
     private String idProduct;
+    private boolean loadingCmt = false;
 
     public CommentProductDialogFragment(String idProduct) {
         this.idProduct = idProduct;
@@ -42,17 +43,21 @@ public class CommentProductDialogFragment extends DialogFragment {
     private void getDataComment() {
         databaseReference = firebaseDatabase.getReference("CommentProduct");
         Query query = databaseReference.orderByChild("idProduct").equalTo(idProduct);
-        query.addValueEventListener(new ValueEventListener() {
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                loadingCmt = true;
                 if (snapshot.exists()) {
                     for (DataSnapshot commentItem :
                             snapshot.getChildren()) {
                         CommentData commentData = commentItem.getValue(CommentData.class);
-                        System.out.println("item cmt: " + commentData.toString());
+
                         arrCommentProduct.add(commentData);
                     }
+                }
+                if (loadingCmt){
                     commentProductAdapter.notifyDataSetChanged();
+                    loadingCmt = false;
                 }
             }
 

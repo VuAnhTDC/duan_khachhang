@@ -45,8 +45,6 @@ public class Fragment_home_screenHome extends Fragment {
     private final Handler handler = new Handler();
     ProductBanerAdapter productBanerAdapter;
 
-    public Fragment_home_screenHome() {
-    }
 
     ArrayList<ProductData> arrProduct = new ArrayList<>();
     ProductListHome_Adapter productListHomeAdapter;
@@ -56,8 +54,8 @@ public class Fragment_home_screenHome extends Fragment {
     ArrayList<String> arrUrl = new ArrayList<>();
     private View view;
 
-    public Fragment_home_screenHome(ArrayList<ProductData> arrProduct){
-        this.arrProduct = arrProduct;
+    public Fragment_home_screenHome(){
+
     }
     @Nullable
     @Override
@@ -69,7 +67,7 @@ public class Fragment_home_screenHome extends Fragment {
         context = getContext();
         setControl();
         setIntiazation();
-//        getProductData();
+        getProductData();
         getLoadingUrlImageProduct(5);
         setEvent();
         locationUrlImageProduct_ItemViewPager = 0;
@@ -100,14 +98,6 @@ public class Fragment_home_screenHome extends Fragment {
         }
     };
 
-    public  void  setLocationUrlImageProduct_ItemViewPager_return(){
-        this.locationUrlImageProduct_ItemViewPager = 0;
-    }
-
-    public void setArrProduct(ProductData product){
-            this.arrProduct.add(product);
-            productListHomeAdapter.notifyDataSetChanged();
-    }
 
     private void getLoadingUrlImageProduct(int count){
         databaseReference = firebaseDatabase.getReference("ImageProducts");
@@ -127,7 +117,6 @@ public class Fragment_home_screenHome extends Fragment {
                     }
                     productBanerAdapter.notifyDataSetChanged();
                     handler.postDelayed(runnable,timeDeplay);
-                    System.out.println("size arr url: " + productBanerAdapter.getCount());
                 }
             }
 
@@ -140,15 +129,16 @@ public class Fragment_home_screenHome extends Fragment {
 
     private void getProductData() {
         databaseReference = firebaseDatabase.getReference("Product");
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                arrProduct.clear();
                 if (snapshot.exists()) {
                     for (DataSnapshot productItem : snapshot.getChildren()) {
                         ProductData productData = productItem.getValue(ProductData.class);
                         arrProduct.add(productData);
+                        productListHomeAdapter.notifyDataSetChanged();
                     }
-                    productListHomeAdapter.notifyDataSetChanged();
                 }
             }
 

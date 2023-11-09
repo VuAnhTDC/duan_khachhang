@@ -1,12 +1,14 @@
 package com.example.duankhachhang;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -15,16 +17,24 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.duankhachhang.Class.Customer;
 import com.example.duankhachhang.Class.OrderData;
+import com.example.duankhachhang.Class.ProductData;
+import com.example.duankhachhang.Dialog.EditDeliveryAddressCustomerDialogFragment;
 import com.example.duankhachhang.RecyclerView.OrderProduct_Adapter;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -37,6 +47,7 @@ public class Buyproduct extends AppCompatActivity {
     LinearLayout vDontVoucher_OrderProduct;
     Spinner spSelectedVocher_OrderProduct;
     Button btnPay_OrderProduct;
+    ImageView ivEditDeliveryAddress;
 
     OrderProduct_Adapter orderProductAdapter;
     ArrayList<OrderData> arrOrderData = new ArrayList<>();
@@ -44,6 +55,7 @@ public class Buyproduct extends AppCompatActivity {
     Customer customer = new Customer();
     private int sumPriceAllProductOrder = 0;
     private int sumPriceAll = 0;
+    private boolean changeDeliveryAddress = false;
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     DatabaseReference  databaseReference;
 
@@ -80,6 +92,7 @@ public class Buyproduct extends AppCompatActivity {
         tvSumMoney_OrderProduct.setText(sumPriceAll + "VND");
 
     }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -105,6 +118,26 @@ public class Buyproduct extends AppCompatActivity {
                 pushDataOrderToFirebase();
             }
         });
+        ivEditDeliveryAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EditDeliveryAddressCustomerDialogFragment.DeliveryAddress deliveryAddress = new EditDeliveryAddressCustomerDialogFragment.DeliveryAddress() {
+                    @Override
+                    public void getDeliveryAddress(String deliveryAddress) {
+                        if(deliveryAddress != null && !deliveryAddress.isEmpty()){
+                            tvAddressUser_OrderProduct.setText(deliveryAddress);
+                            changeDeliveryAddress = true;
+                        }
+                        else {
+                            changeDeliveryAddress = false;
+                        }
+                    }
+                };
+                EditDeliveryAddressCustomerDialogFragment editDeliveryAddressCustomerDialogFragment = new EditDeliveryAddressCustomerDialogFragment(deliveryAddress);
+                editDeliveryAddressCustomerDialogFragment.show(getSupportFragmentManager(),"Sửa địa chỉ nhận hàng");
+            }
+        });
+
 
 
     }
@@ -112,9 +145,49 @@ public class Buyproduct extends AppCompatActivity {
     private void pushDataOrderToFirebase(){
         for (OrderData itemOrder:
              arrOrderData) {
-            databaseReference = firebaseDatabase.getReference("OrderPrduct");
-            databaseReference.child(itemOrder.getIdCustomer_Order()+itemOrder.getIdProduct_Order()).setValue(itemOrder);
+            if (changeDeliveryAddress){
+                itemOrder.setDeliveryAddress(tvAddressUser_OrderProduct.getText().toString());
+            }
+            databaseReference = firebaseDatabase.getReference("Product/"+itemOrder.getIdProduct_Order());
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()){
+                        ProductData productData = snapshot.getValue(ProductData.class);
+                        productData.setQuanlityProduct(productData.getQuanlityProduct() - itemOrder.getQuanlity_Order());
+                        databaseReference.setValue(productData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                databaseReference = firebaseDatabase.getReference("OrderProduct");
+                                databaseReference.child(itemOrder.getIdShop_Order() + "/"+itemOrder.getIdCustomer_Order()+itemOrder.getIdProduct_Order()).setValue(itemOrder).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                        builder.setTitle("Thông báo");
+                                        builder.setMessage("Lỗi khi mua hàng");
+                                        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                dialogInterface.dismiss();
+                                            }
+                                        });
+                                        AlertDialog alertDialog = builder.create();
+                                        alertDialog.show();
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
         }
+        finish();
     }
 
     private void hideKeyboard() {
@@ -144,5 +217,6 @@ public class Buyproduct extends AppCompatActivity {
         spSelectedVocher_OrderProduct = findViewById(R.id.spSelectedVocher_OrderProduct);
         tvSumMoney_OrderProduct = findViewById(R.id.tvSumMoney_OrderProduct);
         btnPay_OrderProduct = findViewById(R.id.btnPay_OrderProduct);
+        ivEditDeliveryAddress = findViewById(R.id.ivEditDeliveryAddress);
     }
 }

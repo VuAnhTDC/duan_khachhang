@@ -89,6 +89,7 @@
                            android:text="80 Lê Văn Chí, phường Linh Trung, Tp Thủ Đức, Tp HCM"
                            />
                        <ImageView
+                           android:id="@+id/ivEditDeliveryAddress"
                            android:layout_width="wrap_content"
                            android:layout_height="wrap_content"
                            android:layout_gravity="right"

@@ -23,7 +23,9 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class ProductListHome_Adapter extends RecyclerView.Adapter<ProductListHome_ViewHolder> {
 
@@ -45,8 +47,11 @@ public class ProductListHome_Adapter extends RecyclerView.Adapter<ProductListHom
     public void onBindViewHolder(@NonNull ProductListHome_ViewHolder holder, int position) {
             ProductData productData = arrProduct.get(position);
             holder.tvNameProductItem_RecyclerViewProductList.setText(productData.getNameProduct());
-            holder.tvPriceProductItem_RecyclerViewProductList.setText(productData.getPriceProduct() + " VND");
+        Locale locale = new Locale("vi","VN");
+        NumberFormat numberFormatVND = NumberFormat.getCurrencyInstance(locale);
+            holder.tvPriceProductItem_RecyclerViewProductList.setText(numberFormatVND.format(productData.getPriceProduct()));
             holder.tvStarProductItem_RecyclerViewProductList.setText(productData.getSumLike() + "");
+            holder.tvCmtProductItem_RecyclerViewProductList.setText(productData.getOverageCmtProduct() + "");
             FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
             DatabaseReference databaseReference = firebaseDatabase.getReference("Shop").child(productData.getIdUserProduct());
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -71,6 +76,7 @@ public class ProductListHome_Adapter extends RecyclerView.Adapter<ProductListHom
                     context.startActivity(intent);
                 }
             });
+
     }
     private void isLoadingImageProductItem(ProductData productDataItem,ProductListHome_ViewHolder holder){
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();

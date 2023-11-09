@@ -11,7 +11,7 @@ import com.example.duankhachhang.R;
 
 public class ProductListHome_ViewHolder extends RecyclerView.ViewHolder {
     ImageView ivProductItem_RecyclerViewProductList;
-    TextView tvNameProductItem_RecyclerViewProductList, tvPriceProductItem_RecyclerViewProductList,tvStarProductItem_RecyclerViewProductList,tvAddressShopProductItem_RecyclerViewProductList;
+    TextView tvNameProductItem_RecyclerViewProductList, tvPriceProductItem_RecyclerViewProductList,tvStarProductItem_RecyclerViewProductList,tvAddressShopProductItem_RecyclerViewProductList,tvCmtProductItem_RecyclerViewProductList;
     public ProductListHome_ViewHolder(@NonNull View itemView) {
         super(itemView);
         ivProductItem_RecyclerViewProductList = itemView.findViewById(R.id.ivProductItem_RecyclerViewProductList);
@@ -19,5 +19,6 @@ public class ProductListHome_ViewHolder extends RecyclerView.ViewHolder {
         tvPriceProductItem_RecyclerViewProductList = itemView.findViewById(R.id.tvPriceProductItem_RecyclerViewProductList);
         tvStarProductItem_RecyclerViewProductList = itemView.findViewById(R.id.tvStarProductItem_RecyclerViewProductList);
         tvAddressShopProductItem_RecyclerViewProductList = itemView.findViewById(R.id.tvAddressShopProductItem_RecyclerViewProductList);
+        tvCmtProductItem_RecyclerViewProductList = itemView.findViewById(R.id.tvCmtProductItem_RecyclerViewProductList);
     }
 }

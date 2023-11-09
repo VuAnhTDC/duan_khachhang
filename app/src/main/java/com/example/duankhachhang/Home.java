@@ -44,9 +44,9 @@ public class Home extends AppCompatActivity {
 //        Intent intent = getIntent();
 //        customer = (Customer)intent.getSerializableExtra("informationCustomer");
         customer = new Customer("0123456789", "demo address", "Demo", null);
-        getDataProduct();
         setControl();
         setEvent();
+        loadingFragment(new Fragment_home_screenHome());
     }
 
     private void setEvent() {
@@ -54,7 +54,7 @@ public class Home extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 if(item.getItemId() == R.id.itemHome_Navigationbar){
-                    loadingFragment(new Fragment_home_screenHome(arrProduct));
+                    loadingFragment(new Fragment_home_screenHome());
                     return true;
                 }
                 else  if (item.getItemId() == R.id.itemMessage_Navigationbar){
@@ -83,27 +83,27 @@ public class Home extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
-    private void getDataProduct(){
-        databaseReference = firebaseDatabase.getReference("Product");
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                Fragment_home_screenHome fragmentHomeScreenHome = new Fragment_home_screenHome();
-//                loadingFragment(fragmentHomeScreenHome);
-                if (snapshot.exists()) {
-                    for (DataSnapshot productItem : snapshot.getChildren()) {
-                        ProductData productData = productItem.getValue(ProductData.class);
-                        arrProduct.add(productData);
-                        loadingFragment(new Fragment_home_screenHome(arrProduct));
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                System.out.println("Lối lấy danh sách sản phẩm");
-            }
-        });
-    }
+//    private void getDataProduct(){
+//        databaseReference = firebaseDatabase.getReference("Product");
+//        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+////                Fragment_home_screenHome fragmentHomeScreenHome = new Fragment_home_screenHome();
+////                loadingFragment(fragmentHomeScreenHome);
+//                if (snapshot.exists()) {
+//                    for (DataSnapshot productItem : snapshot.getChildren()) {
+//                        ProductData productData = productItem.getValue(ProductData.class);
+//                        arrProduct.add(productData);
+//                        loadingFragment(new Fragment_home_screenHome(arrProduct));
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//                System.out.println("Lối lấy danh sách sản phẩm");
+//            }
+//        });
+//    }
 
 }
