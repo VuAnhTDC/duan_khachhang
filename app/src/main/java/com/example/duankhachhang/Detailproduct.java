@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -64,15 +65,17 @@ public class Detailproduct extends AppCompatActivity {
     LinearLayout vAvataShop_DetailProduct, vSumlike_DetailProduct, vSumCmt_DetailProduct;
 
     RecyclerView rcvRelatedProducts;
-    RelatedProducts_Adapter relatedProductsAdapter ;
+    RelatedProducts_Adapter relatedProductsAdapter;
     private ProductData productData = new ProductData();
     private ProductBanerAdapter productBanerAdapter;
     private ArrayList<String> arrUrlImage = new ArrayList<>();
     private boolean isClickLike = false;
+    private boolean isProductInCart = false;
     private Customer customer = new Customer();
     private String idProduct = "";
     private boolean productIsOutOfStock = false;
     private boolean loadingFirt = false;
+    private int countRelatedProducts = 0;
     private ArrayList<ProductData> arrRelatedProducts = new ArrayList<>();
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     DatabaseReference databaseReference;
@@ -89,37 +92,9 @@ public class Detailproduct extends AppCompatActivity {
         getDataProduct();
         checkLikeProductOfCustomer();
         checkProductInCart();
-        checkBuyProduct();
         setEvent();
     }
 
-    private void checkBuyProduct(){
-        databaseReference = firebaseDatabase.getReference("OrderPrduct");
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-               if (snapshot.exists()){
-                   for (DataSnapshot item:
-                        snapshot.getChildren()) {
-                       for (DataSnapshot itemSnap:
-                            item.getChildren()) {
-                           if (itemSnap.getKey().equals(customer.getId()+idProduct)){
-                              btnBuyProduct_DetailProduct.setText("Đang vận chuyển");
-                              btnBuyProduct_DetailProduct.setTextSize(14.0f);
-                              btnBuyProduct_DetailProduct.setEnabled(false);
-                              return;
-                           }
-                       }
-                   }
-               }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
     private void getDataProduct() {
         databaseReference = firebaseDatabase.getReference("Product/" + idProduct);
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -134,7 +109,7 @@ public class Detailproduct extends AppCompatActivity {
                     getInformationProduct();
                     if (!loadingFirt) {
                         setAvataShop(productData.getIdUserProduct());
-                        getRealtedProducts(productData.getKeyCategoryProduct());
+                        getRealtedProducts(productData.getKeyCategoryProduct(), 10);
                         loadingFirt = true;
                     }
                 }
@@ -159,8 +134,8 @@ public class Detailproduct extends AppCompatActivity {
         viewPagerImageProduct_DetailProduct.setAdapter(productBanerAdapter);
 
 //        gán giá trị adapter recyclerview sản phẩm liên quan
-        relatedProductsAdapter =  new RelatedProducts_Adapter(arrRelatedProducts,context);
-        rcvRelatedProducts.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
+        relatedProductsAdapter = new RelatedProducts_Adapter(arrRelatedProducts, context);
+        rcvRelatedProducts.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         rcvRelatedProducts.setAdapter(relatedProductsAdapter);
 
     }
@@ -210,17 +185,16 @@ public class Detailproduct extends AppCompatActivity {
     }
 
     private void checkProductInCart() {
-        databaseReference = firebaseDatabase.getReference("CartCustomer/" + customer.getId() + "/" + customer.getId() + idProduct);
+        databaseReference = firebaseDatabase.getReference("CartCustomer/" + customer.getId() + "/" + idProduct);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     btnAddCart_DetailProduct.setText("Đã thêm giỏ hàng");
-                    btnAddCart_DetailProduct.setEnabled(false);
                     btnAddCart_DetailProduct.setBackgroundResource(R.drawable.bg_button_press_01);
+                    isProductInCart = true;
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -231,7 +205,7 @@ public class Detailproduct extends AppCompatActivity {
 
     private void getInformationProduct() {
         tvNameProduct_DetailProduct.setText(productData.getNameProduct());
-        Locale locale = new Locale("vi","VN");
+        Locale locale = new Locale("vi", "VN");
         NumberFormat numberFormatVND = NumberFormat.getCurrencyInstance(locale);
         tvPriceProduct_DetailProduct.setText(numberFormatVND.format(productData.getPriceProduct()));
         if (productData.getQuanlityProduct() > 0) {
@@ -271,19 +245,23 @@ public class Detailproduct extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-//    xuất danh sách sản phẩm liên quan
-    private void getRealtedProducts(String keyCategoryProduct){
+    //    xuất danh sách sản phẩm liên quan
+    private void getRealtedProducts(String keyCategoryProduct, int count) {
         databaseReference = firebaseDatabase.getReference("Product");
         Query query = databaseReference.orderByChild("keyCategoryProduct").equalTo(keyCategoryProduct);
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    for (DataSnapshot item:
-                         snapshot.getChildren()) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot item :
+                            snapshot.getChildren()) {
+                        if (count == countRelatedProducts) {
+                            return;
+                        }
                         ProductData productData1 = item.getValue(ProductData.class);
                         arrRelatedProducts.add(productData1);
                         relatedProductsAdapter.notifyDataSetChanged();
+                        countRelatedProducts++;
                     }
                 }
             }
@@ -359,12 +337,6 @@ public class Detailproduct extends AppCompatActivity {
                 commentProductDialogFragment.show(getSupportFragmentManager(), "Đánh giá");
             }
         });
-        btnAddCart_DetailProduct.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
 
         btnBuyProduct_DetailProduct.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -387,7 +359,7 @@ public class Detailproduct extends AppCompatActivity {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                     String formattedDate = dateFormat.format(date);
                     int priceOrder = productData.getPriceProduct() * 1;
-                    OrderData orderData = new OrderData(customer.getId() + idProduct, customer.getId(), idProduct, productData.getIdUserProduct(), "", 0, formattedDate, customer.getAddress(), customer.getId(), "", 1, priceOrder,"","");
+                    OrderData orderData = new OrderData(customer.getId() + idProduct, customer.getId(), idProduct, productData.getIdUserProduct(), "", 0, formattedDate, customer.getAddress(), customer.getId(), "", 1, priceOrder, "", "");
                     arrOrder.add(orderData);
                     Intent intent = new Intent(context, Buyproduct.class);
                     intent.putExtra("arrOrder", arrOrder);
@@ -400,37 +372,47 @@ public class Detailproduct extends AppCompatActivity {
         btnAddCart_DetailProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CartData cartData = new CartData(customer.getId() + productData.getIdProduct(), customer.getId(), productData.getIdProduct(), 1);
-                databaseReference = firebaseDatabase.getReference("CartCustomer");
-                databaseReference.child(customer.getId() + "/" + cartData.getIdCart()).setValue(cartData).addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void unused) {
-                                btnAddCart_DetailProduct.setText("Đã thêm giỏ hàng");
-                                btnAddCart_DetailProduct.setEnabled(false);
-                                btnAddCart_DetailProduct.setBackgroundResource(R.drawable.bg_button_press_01);
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                builder.setTitle("Thông báo");
-                                builder.setMessage("Thêm sản phẩm không thành công");
-                                builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialogInterface, int i) {
-                                        dialogInterface.dismiss();
-                                    }
-                                });
-                            }
-                        });
+                if (isProductInCart) {
+                    Intent intent = new Intent(context, CartCustomer.class);
+                    startActivity(intent);
+                } else {
+                    CartData cartData = new CartData(productData.getIdProduct(), customer.getId(), productData.getIdProduct(), 1);
+                    databaseReference = firebaseDatabase.getReference("CartCustomer");
+                    databaseReference.child(customer.getId() + "/" + cartData.getIdCart()).setValue(cartData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    btnAddCart_DetailProduct.setText("Đã thêm giỏ hàng");
+                                    btnAddCart_DetailProduct.setBackgroundResource(R.drawable.bg_button_press_01);
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                    builder.setTitle("Thông báo");
+                                    builder.setMessage("Thêm sản phẩm không thành công");
+                                    builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            dialogInterface.dismiss();
+                                        }
+                                    });
+                                }
+                            })
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    Toast.makeText(context, "Đã thêm sản phẩm vào giỏ hàng", Toast.LENGTH_SHORT);
+                                }
+                            });
+                }
             }
         });
         ivAvataShop_DetailProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, DetailShop.class);
-                intent.putExtra("idShop",productData.getIdUserProduct());
+                intent.putExtra("idShop", productData.getIdUserProduct());
                 startActivity(intent);
             }
         });

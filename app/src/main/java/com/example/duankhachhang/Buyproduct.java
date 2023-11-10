@@ -19,8 +19,10 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.duankhachhang.Class.Customer;
 import com.example.duankhachhang.Class.OrderData;
@@ -48,6 +50,7 @@ public class Buyproduct extends AppCompatActivity {
     Spinner spSelectedVocher_OrderProduct;
     Button btnPay_OrderProduct;
     ImageView ivEditDeliveryAddress;
+    LinearLayout loading_BuyProduct;
 
     OrderProduct_Adapter orderProductAdapter;
     ArrayList<OrderData> arrOrderData = new ArrayList<>();
@@ -115,7 +118,26 @@ public class Buyproduct extends AppCompatActivity {
         btnPay_OrderProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pushDataOrderToFirebase();
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Thông báo");
+                builder.setMessage("Bạn có muốn mua sản phẩm này không");
+                builder.setNegativeButton("Không", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+                builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        loading_BuyProduct.setVisibility(View.VISIBLE);
+                        pushDataOrderToFirebase();
+                    }
+                });
+
+                AlertDialog alertDialog = builder.create();
+                alertDialog.show();
+
             }
         });
         ivEditDeliveryAddress.setOnClickListener(new View.OnClickListener() {
@@ -159,7 +181,9 @@ public class Buyproduct extends AppCompatActivity {
                             @Override
                             public void onSuccess(Void unused) {
                                 databaseReference = firebaseDatabase.getReference("OrderProduct");
-                                databaseReference.child(itemOrder.getIdShop_Order() + "/"+itemOrder.getIdCustomer_Order()+itemOrder.getIdProduct_Order()).setValue(itemOrder).addOnFailureListener(new OnFailureListener() {
+                                String keyPush = databaseReference.push().toString().substring(databaseReference.push().toString().lastIndexOf("/"));
+                                itemOrder.setIdOrder(keyPush.substring(0));
+                                databaseReference.child(itemOrder.getIdShop_Order() + keyPush).setValue(itemOrder).addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
                                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -175,6 +199,8 @@ public class Buyproduct extends AppCompatActivity {
                                         alertDialog.show();
                                     }
                                 });
+                                Toast.makeText(context, "Đã mua hàng thành công",Toast.LENGTH_SHORT).show();
+                                finish();
                             }
                         });
                     }
@@ -187,7 +213,6 @@ public class Buyproduct extends AppCompatActivity {
             });
 
         }
-        finish();
     }
 
     private void hideKeyboard() {
@@ -218,5 +243,6 @@ public class Buyproduct extends AppCompatActivity {
         tvSumMoney_OrderProduct = findViewById(R.id.tvSumMoney_OrderProduct);
         btnPay_OrderProduct = findViewById(R.id.btnPay_OrderProduct);
         ivEditDeliveryAddress = findViewById(R.id.ivEditDeliveryAddress);
+        loading_BuyProduct = findViewById(R.id.loading_BuyProduct);
     }
 }

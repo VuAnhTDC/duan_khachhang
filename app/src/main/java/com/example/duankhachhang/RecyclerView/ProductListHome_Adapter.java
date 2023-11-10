@@ -40,56 +40,58 @@ public class ProductListHome_Adapter extends RecyclerView.Adapter<ProductListHom
     @NonNull
     @Override
     public ProductListHome_ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ProductListHome_ViewHolder(LayoutInflater.from(context).inflate(R.layout.customer_productitem_screenhome,parent,false));
+        return new ProductListHome_ViewHolder(LayoutInflater.from(context).inflate(R.layout.customer_productitem_screenhome, parent, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull ProductListHome_ViewHolder holder, int position) {
-            ProductData productData = arrProduct.get(position);
-            holder.tvNameProductItem_RecyclerViewProductList.setText(productData.getNameProduct());
-        Locale locale = new Locale("vi","VN");
+        ProductData productData = arrProduct.get(position);
+        holder.tvNameProductItem_RecyclerViewProductList.setText(productData.getNameProduct());
+        Locale locale = new Locale("vi", "VN");
         NumberFormat numberFormatVND = NumberFormat.getCurrencyInstance(locale);
-            holder.tvPriceProductItem_RecyclerViewProductList.setText(numberFormatVND.format(productData.getPriceProduct()));
-            holder.tvStarProductItem_RecyclerViewProductList.setText(productData.getSumLike() + "");
-            holder.tvCmtProductItem_RecyclerViewProductList.setText(productData.getOverageCmtProduct() + "");
-            FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-            DatabaseReference databaseReference = firebaseDatabase.getReference("Shop").child(productData.getIdUserProduct());
-            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if(snapshot.exists()){
-                        ShopData shopData = snapshot.getValue(ShopData.class);
-                        holder.tvAddressShopProductItem_RecyclerViewProductList.setText(shopData.getShopAddress());
-                    }
+        holder.tvPriceProductItem_RecyclerViewProductList.setText(numberFormatVND.format(productData.getPriceProduct()));
+        holder.tvStarProductItem_RecyclerViewProductList.setText(productData.getSumLike() + "");
+        holder.tvCmtProductItem_RecyclerViewProductList.setText(productData.getOverageCmtProduct() + "");
+        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+        DatabaseReference databaseReference = firebaseDatabase.getReference("Shop").child(productData.getIdUserProduct());
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    ShopData shopData = snapshot.getValue(ShopData.class);
+                    holder.tvAddressShopProductItem_RecyclerViewProductList.setText(shopData.getShopAddress());
                 }
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+            }
 
-                }
-            });
-            isLoadingImageProductItem(productData,holder);
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(context, Detailproduct.class);
-                    intent.putExtra("idProduct",productData.getIdProduct());
-                    context.startActivity(intent);
-                }
-            });
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+        isLoadingImageProductItem(productData, holder);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, Detailproduct.class);
+                intent.putExtra("idProduct", productData.getIdProduct());
+                context.startActivity(intent);
+            }
+        });
 
     }
-    private void isLoadingImageProductItem(ProductData productDataItem,ProductListHome_ViewHolder holder){
+
+    private void isLoadingImageProductItem(ProductData productDataItem, ProductListHome_ViewHolder holder) {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         DatabaseReference databaseReference = firebaseDatabase.getReference("ImageProducts");
         Query query = databaseReference.orderByChild("idProduct").equalTo(productDataItem.getIdProduct());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()){
-                    for (DataSnapshot imageItem:
-                         snapshot.getChildren()) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot imageItem :
+                            snapshot.getChildren()) {
                         Image image = imageItem.getValue(Image.class);
-                        Picasso.get().load(image.getUrlImage()).into(holder.ivProductItem_RecyclerViewProductList);
+                        Picasso.get().load(image.getUrlImage()).placeholder(R.drawable.icondowload).into(holder.ivProductItem_RecyclerViewProductList);
                         return;
                     }
                 }

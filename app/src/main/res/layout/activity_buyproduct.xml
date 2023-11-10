@@ -13,348 +13,363 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-   <FrameLayout
-       android:layout_width="match_parent"
-       android:layout_height="match_parent">
-<!--       Content-->
-       <androidx.core.widget.NestedScrollView
-           android:layout_width="match_parent"
-           android:layout_height="match_parent"
-           android:paddingBottom="70dp"
-           android:layout_marginTop="10dp">
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-           <LinearLayout
-               android:layout_width="match_parent"
-               android:layout_height="match_parent"
-               android:orientation="vertical">
-               <!--        Địa chỉ nhận hàng-->
-               <LinearLayout
-                   android:layout_width="match_parent"
-                   android:layout_height="wrap_content"
-                   android:layout_marginHorizontal="20dp"
-                   android:paddingVertical="10dp"
-                   android:paddingHorizontal="20dp"
-                   android:background="@drawable/bg_container_01"
-                   android:orientation="vertical"
-                   >
-                   <LinearLayout
-                       android:layout_width="match_parent"
-                       android:layout_height="wrap_content"
-                       android:orientation="horizontal"
-                       android:gravity="center"
-                       >
-                       <ImageView
-                           android:layout_width="40dp"
-                           android:layout_height="40dp"
-                           android:src="@drawable/icon_distance"
-                           />
-                       <TextView
-                           android:layout_width="match_parent"
-                           android:layout_height="wrap_content"
-                           android:textStyle="bold"
-                           android:textSize="18dp"
-                           android:text="Địa chỉ nhận hàng"
-                           />
-                   </LinearLayout>
-                   <LinearLayout
-                       android:layout_width="match_parent"
-                       android:layout_height="wrap_content"
-                       android:orientation="horizontal"
-                       >
-                       <TextView
-                           android:id="@+id/tvUserName_OrderProduct"
-                           android:layout_width="wrap_content"
-                           android:layout_height="wrap_content"
-                           android:textSize="17dp"
-                           android:textStyle="bold"
-                           android:text="Nguyen Van A |"
-                           />
-                       <TextView
-                           android:id="@+id/tvNumberphone_OrderProduct"
-                           android:layout_width="wrap_content"
-                           android:layout_height="wrap_content"
-                           android:textStyle="italic"
-                           android:text=" 0123456789"
-                           />
-                   </LinearLayout>
-                   <LinearLayout
-                       android:layout_width="match_parent"
-                       android:layout_height="wrap_content"
-                       android:orientation="vertical"
-                       >
-                       <TextView
-                           android:id="@+id/tvAddressUser_OrderProduct"
-                           android:layout_width="match_parent"
-                           android:layout_height="wrap_content"
-                           android:text="80 Lê Văn Chí, phường Linh Trung, Tp Thủ Đức, Tp HCM"
-                           />
-                       <ImageView
-                           android:id="@+id/ivEditDeliveryAddress"
-                           android:layout_width="wrap_content"
-                           android:layout_height="wrap_content"
-                           android:layout_gravity="right"
-                           android:src="@drawable/icon_edit"
-                           />
-                   </LinearLayout>
-               </LinearLayout>
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <!--       Content-->
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:paddingBottom="70dp">
 
-               <!--            Danh sách đơn hàng-->
-               <androidx.recyclerview.widget.RecyclerView
-                   android:id="@+id/rcvOrderList_OrderProduct"
-                   android:layout_width="match_parent"
-                   android:layout_height="wrap_content"
-                   android:layout_marginHorizontal="10dp"
-                   android:layout_marginTop="10dp"
-                   />
-               <com.google.android.material.textfield.TextInputLayout
-                   android:layout_width="match_parent"
-                   android:layout_height="wrap_content"
-                   android:layout_marginTop="10dp"
-                   android:layout_marginHorizontal="20dp"
-                   >
-                   <com.google.android.material.textfield.TextInputEditText
-                       android:id="@+id/edtNote_OrderProduct"
-                       android:layout_width="match_parent"
-                       android:layout_height="wrap_content"
-                       android:paddingHorizontal="10dp"
-                       android:paddingVertical="5dp"
-                       android:background="@drawable/bg_textinput_normal"
-                       android:inputType="text"
-                       android:imeOptions="actionDone"
-                       android:hint="Ghi chú"
-                       />
-               </com.google.android.material.textfield.TextInputLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+                    <!--        Địa chỉ nhận hàng-->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="20dp"
+                        android:background="@drawable/bg_container_01"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="20dp"
+                        android:paddingVertical="10dp">
 
-             <FrameLayout
-                 android:layout_width="match_parent"
-                 android:layout_height="wrap_content">
-                 <LinearLayout
-                     android:id="@+id/vDontVoucher_OrderProduct"
-                     android:layout_width="match_parent"
-                     android:layout_height="wrap_content"
-                     android:orientation="vertical"
-                     android:background="@drawable/bg_container_02"
-                     android:layout_marginHorizontal="20dp"
-                     android:layout_marginTop="10dp"
-                     >
-                     <TextView
-                         android:layout_width="match_parent"
-                         android:layout_height="wrap_content"
-                         android:textSize="20dp"
-                         android:textStyle="bold"
-                         android:textColor="#000"
-                         android:text="Voucher"
-                         />
-                     <TextView
-                         android:layout_width="match_parent"
-                         android:layout_height="wrap_content"
-                         android:gravity="right"
-                         android:textStyle="italic"
-                         android:text="Không có voucher nào"
-                         />
-                 </LinearLayout>
-                 <Spinner
-                     android:id="@+id/spSelectedVocher_OrderProduct"
-                     android:visibility="gone"
-                     android:layout_width="match_parent"
-                     android:layout_height="wrap_content"
-                     android:layout_marginTop="10dp"
-                     android:layout_marginHorizontal="20dp"
-                     android:background="@drawable/bg_container_02"
-                     />
-             </FrameLayout>
-               <LinearLayout
-                   android:layout_width="match_parent"
-                   android:layout_height="wrap_content"
-                   android:layout_marginHorizontal="20dp"
-                   android:layout_marginTop="10dp"
-                   android:background="@drawable/bg_container_02"
-                   android:orientation="vertical">
-                   <TextView
-                       android:layout_width="match_parent"
-                       android:layout_height="wrap_content"
-                       android:textStyle="bold"
-                       android:textSize="20dp"
-                       android:textColor="#000"
-                       android:text="Phương thức thanh toán"
-                       />
-                   <TextView
-                       android:layout_width="match_parent"
-                       android:layout_height="wrap_content"
-                       android:gravity="right"
-                       android:textStyle="italic"
-                       android:text="Thanh toán khi nhận hàng (Bắt buộc)"
-                       />
-               </LinearLayout>
-               <LinearLayout
-                   android:layout_width="match_parent"
-                   android:layout_height="wrap_content"
-                   android:orientation="vertical"
-                   android:layout_marginHorizontal="20dp"
-                   android:layout_marginTop="10dp"
-                   >
-                   <LinearLayout
-                       android:layout_width="match_parent"
-                       android:layout_height="wrap_content"
-                       android:orientation="horizontal"
-                       android:gravity="center"
-                       >
-                       <ImageView
-                           android:layout_width="50dp"
-                           android:layout_height="50dp"
-                           android:src="@drawable/icon_receipt"
-                           />
-                       <TextView
-                           android:layout_width="match_parent"
-                           android:layout_height="wrap_content"
-                           android:textSize="20dp"
-                           android:textStyle="bold"
-                           android:textColor="#000"
-                           android:text="Chi tiết sản phẩm"
-                           />
-                   </LinearLayout>
-                   <!--                Tổng tiền sản phẩm-->
-                   <LinearLayout
-                       android:layout_width="match_parent"
-                       android:layout_height="wrap_content"
-                       android:orientation="horizontal"
-                       android:weightSum="3"
-                       >
-                       <TextView
-                           android:layout_width="0dp"
-                           android:layout_height="wrap_content"
-                           android:layout_weight="1"
-                           android:textSize="15dp"
-                           android:textStyle="bold"
-                           android:textColor="#000"
-                           android:text="Tổng tiền hàng"
-                           />
-                       <TextView
-                           android:id="@+id/tvSumPriceProduct_OrderProduct"
-                           android:layout_width="0dp"
-                           android:layout_height="wrap_content"
-                           android:layout_weight="2"
-                           android:gravity="right"
-                           android:textColor="#E80000"
-                           android:textStyle="bold"
-                           android:text="999999999 Vnd"
-                           />
-                   </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="horizontal">
 
-                   <!--                Tiền vận chuyển-->
-                   <LinearLayout
-                       android:layout_width="match_parent"
-                       android:layout_height="wrap_content"
-                       android:orientation="horizontal"
-                       android:weightSum="3"
-                       android:gravity="center"
-                       >
-                       <TextView
-                           android:layout_width="0dp"
-                           android:layout_height="wrap_content"
-                           android:layout_weight="1"
-                           android:textSize="15dp"
-                           android:textStyle="bold"
-                           android:textColor="#000"
-                           android:text="Tiền vận chuyển"
-                           />
-                       <TextView
-                           android:id="@+id/tvTranportation_OrderProduct"
-                           android:layout_width="0dp"
-                           android:layout_height="wrap_content"
-                           android:layout_weight="2"
-                           android:gravity="right"
-                           android:textColor="#E80000"
-                           android:textStyle="bold"
-                           android:text="25.000 Vnd"
-                           />
-                   </LinearLayout>
+                            <ImageView
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:src="@drawable/icon_distance" />
 
-                   <!--                Voucher-->
-                   <LinearLayout
-                       android:layout_width="match_parent"
-                       android:layout_height="wrap_content"
-                       android:orientation="horizontal"
-                       android:weightSum="3"
-                       >
-                       <TextView
-                           android:layout_width="0dp"
-                           android:layout_height="wrap_content"
-                           android:layout_weight="1"
-                           android:textSize="15dp"
-                           android:textStyle="bold"
-                           android:textColor="#000"
-                           android:text="Voucher"
-                           />
-                       <TextView
-                           android:id="@+id/tvVoucher_OrderProduct"
-                           android:layout_width="0dp"
-                           android:layout_height="wrap_content"
-                           android:layout_weight="2"
-                           android:gravity="right"
-                           android:textColor="#E80000"
-                           android:textStyle="bold"
-                           android:text="0 Vnd"
-                           />
-                   </LinearLayout>
-               </LinearLayout>
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Địa chỉ nhận hàng"
+                                android:textSize="18dp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
 
-           </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
 
-       </androidx.core.widget.NestedScrollView>
+                            <TextView
+                                android:id="@+id/tvUserName_OrderProduct"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Nguyen Van A |"
+                                android:textSize="17dp"
+                                android:textStyle="bold" />
 
-<!--       thanh toán-->
-       <LinearLayout
-           android:layout_width="match_parent"
-           android:layout_height="match_parent"
-           android:orientation="vertical"
-           android:gravity="bottom"
-           >
-           <LinearLayout
-               android:layout_width="match_parent"
-               android:layout_height="wrap_content"
-               android:orientation="horizontal"
-               android:weightSum="3"
-               android:paddingVertical="5dp"
-               >
-               <LinearLayout
-                   android:layout_width="0dp"
-                   android:layout_height="wrap_content"
-                   android:layout_weight="2"
-                   android:orientation="vertical"
-                   android:background="@drawable/bg_container_summorney_orderproduct"
-                   >
-                   <TextView
-                       android:layout_width="match_parent"
-                       android:layout_height="wrap_content"
-                       android:textAlignment="center"
-                       android:textStyle="bold"
-                       android:textColor="#000"
-                       android:text="Tổng giá"
-                       />
-                   <TextView
-                       android:id="@+id/tvSumMoney_OrderProduct"
-                       android:layout_width="match_parent"
-                       android:layout_height="wrap_content"
-                       android:textSize="30dp"
-                       android:textColor="#BC0000"
-                       android:textStyle="bold"
-                       android:textAlignment="center"
-                       android:text="2.950.000 VND"
-                       />
-               </LinearLayout>
-               <Button
-                   android:id="@+id/btnPay_OrderProduct"
-                   android:layout_width="0dp"
-                   android:layout_weight="1"
-                   android:layout_height="match_parent"
-                   android:background="@drawable/bg_button_payorder"
-                   android:textStyle="bold"
-                   android:text="Thanh toán"
-                   />
-           </LinearLayout>
+                            <TextView
+                                android:id="@+id/tvNumberphone_OrderProduct"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=" 0123456789"
+                                android:textStyle="italic" />
+                        </LinearLayout>
 
-       </LinearLayout>
-   </FrameLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvAddressUser_OrderProduct"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="80 Lê Văn Chí, phường Linh Trung, Tp Thủ Đức, Tp HCM" />
+
+                            <ImageView
+                                android:id="@+id/ivEditDeliveryAddress"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="right"
+                                android:src="@drawable/icon_edit" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!--            Danh sách đơn hàng-->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rcvOrderList_OrderProduct"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="10dp"
+                        android:layout_marginTop="10dp" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginTop="10dp">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edtNote_OrderProduct"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_textinput_normal"
+                            android:hint="Ghi chú"
+                            android:imeOptions="actionDone"
+                            android:inputType="text"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="5dp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:id="@+id/vDontVoucher_OrderProduct"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="20dp"
+                            android:layout_marginTop="10dp"
+                            android:background="@drawable/bg_container_02"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Voucher"
+                                android:textColor="#000"
+                                android:textSize="20dp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="right"
+                                android:text="Không có voucher nào"
+                                android:textStyle="italic" />
+                        </LinearLayout>
+
+                        <Spinner
+                            android:id="@+id/spSelectedVocher_OrderProduct"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="20dp"
+                            android:layout_marginTop="10dp"
+                            android:background="@drawable/bg_container_02"
+                            android:visibility="gone" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/bg_container_02"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Phương thức thanh toán"
+                            android:textColor="#000"
+                            android:textSize="20dp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="right"
+                            android:text="Thanh toán khi nhận hàng (Bắt buộc)"
+                            android:textStyle="italic" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginTop="10dp"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="50dp"
+                                android:layout_height="50dp"
+                                android:src="@drawable/icon_receipt" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="Chi tiết sản phẩm"
+                                android:textColor="#000"
+                                android:textSize="20dp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                        <!--                Tổng tiền sản phẩm-->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:weightSum="3">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Tổng tiền hàng"
+                                android:textColor="#000"
+                                android:textSize="15dp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvSumPriceProduct_OrderProduct"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="2"
+                                android:gravity="right"
+                                android:text="999999999 Vnd"
+                                android:textColor="#E80000"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!--                Tiền vận chuyển-->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="horizontal"
+                            android:weightSum="3">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Tiền vận chuyển"
+                                android:textColor="#000"
+                                android:textSize="15dp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvTranportation_OrderProduct"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="2"
+                                android:gravity="right"
+                                android:text="25.000 Vnd"
+                                android:textColor="#E80000"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!--                Voucher-->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:weightSum="3">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Voucher"
+                                android:textColor="#000"
+                                android:textSize="15dp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvVoucher_OrderProduct"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="2"
+                                android:gravity="right"
+                                android:text="0 Vnd"
+                                android:textColor="#E80000"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.core.widget.NestedScrollView>
+
+            <!--       thanh toán-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="bottom"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingVertical="5dp"
+                    android:weightSum="3">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:background="@drawable/bg_container_summorney_orderproduct"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Tổng giá"
+                            android:textAlignment="center"
+                            android:textColor="#000"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvSumMoney_OrderProduct"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="2.950.000 VND"
+                            android:textAlignment="center"
+                            android:textColor="#BC0000"
+                            android:textSize="30dp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <Button
+                        android:id="@+id/btnPay_OrderProduct"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_button_payorder"
+                        android:text="Thanh toán"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/loading_BuyProduct"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#80E6E5E5"
+            >
+            <ProgressBar
+                android:indeterminate="true"
+                android:layout_width="100dp"
+                android:layout_height="100dp"/>
+        </LinearLayout>
+    </FrameLayout>
 
 </LinearLayout>

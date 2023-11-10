@@ -20,6 +20,9 @@
         android:theme="@style/Theme.Duankhachhang"
         tools:targetApi="31">
         <activity
+            android:name=".CartCustomer"
+            android:exported="false" />
+        <activity
             android:name=".Home"
             android:exported="true"
             android:windowSoftInputMode="adjustNothing">

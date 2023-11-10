@@ -89,7 +89,7 @@
                 android:id="@+id/til_DiaChi_DangKy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:startIconDrawable="@drawable/id_location"
+                app:startIconDrawable="@drawable/icon_location"
                 app:errorEnabled="true"
                 app:errorIconDrawable="@drawable/error"
                 app:boxStrokeErrorColor="?attr/colorError"

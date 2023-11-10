@@ -1,25 +1,25 @@
 package com.example.duankhachhang.Fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.duankhachhang.Adapter.ProductBanerAdapter;
+import com.example.duankhachhang.CartCustomer;
 import com.example.duankhachhang.Class.Customer;
 import com.example.duankhachhang.Class.Image;
 import com.example.duankhachhang.Class.ProductData;
@@ -35,25 +35,23 @@ import java.util.ArrayList;
 
 public class Fragment_home_screenHome extends Fragment {
     private Customer customer = new Customer();
+    TextView tvCountProductCart_FragmentHome,tvCountNotification_FragmentHome;
     Context context;
     ViewPager viewPagerProductBanner_Home;
     RecyclerView rcvProductList_Home;
-    private int count_Notification = 0;
+    FrameLayout vCountCartCustomer_FragmentHome;
     private int countUrl = 0;
     private int locationUrlImageProduct_ItemViewPager = 0;
     private int timeDeplay = 2000;
+    private int countProductInCart = 0;
     private final Handler handler = new Handler();
     ProductBanerAdapter productBanerAdapter;
-
-
     ArrayList<ProductData> arrProduct = new ArrayList<>();
     ProductListHome_Adapter productListHomeAdapter;
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     DatabaseReference databaseReference;
-
     ArrayList<String> arrUrl = new ArrayList<>();
     private View view;
-
     public Fragment_home_screenHome(){
 
     }
@@ -67,14 +65,43 @@ public class Fragment_home_screenHome extends Fragment {
         context = getContext();
         setControl();
         setIntiazation();
+        setCountProductCartUser();
         getProductData();
         getLoadingUrlImageProduct(5);
         setEvent();
         locationUrlImageProduct_ItemViewPager = 0;
         return view;
     }
+
+    private void setCountProductCartUser(){
+        databaseReference = firebaseDatabase.getReference("CartCustomer/" + customer.getId());
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    countProductInCart = 0;
+                    for (DataSnapshot itemCart:
+                         snapshot.getChildren()) {
+                       countProductInCart ++;
+                    }
+                    if (countProductInCart > 0){
+                        tvCountProductCart_FragmentHome.setText(countProductInCart+"");
+                        tvCountProductCart_FragmentHome.setVisibility(View.VISIBLE);
+                    }
+
+                }
+                else {
+                    tvCountProductCart_FragmentHome.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
     private void setIntiazation() {
-        AppCompatActivity activity = (AppCompatActivity) getActivity();
         productListHomeAdapter = new ProductListHome_Adapter(arrProduct, context);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(context, 2);
         rcvProductList_Home.setLayoutManager(gridLayoutManager);
@@ -82,6 +109,9 @@ public class Fragment_home_screenHome extends Fragment {
 
         productBanerAdapter = new ProductBanerAdapter(arrUrl,context);
         viewPagerProductBanner_Home.setAdapter(productBanerAdapter);
+        if (countProductInCart == 0){
+            tvCountProductCart_FragmentHome.setVisibility(View.GONE);
+        }
     }
     private final Runnable runnable = new Runnable() {
         @Override
@@ -150,11 +180,21 @@ public class Fragment_home_screenHome extends Fragment {
     }
 
     private void setEvent() {
+        vCountCartCustomer_FragmentHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, CartCustomer.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void setControl() {
         rcvProductList_Home = view.findViewById(R.id.rcvProductList_Home);
-        viewPagerProductBanner_Home = view.findViewById(R.id.viewPagerProductBanner_Home);
+        viewPagerProductBanner_Home = view.findViewById(R.id.viewPagerProductBanner_FragmentHome);
+        tvCountProductCart_FragmentHome = view.findViewById(R.id.tvCountProductCart_FragmentHome);
+        tvCountNotification_FragmentHome = view.findViewById(R.id.tvCountNotification_FragmentHome);
+        vCountCartCustomer_FragmentHome = view.findViewById(R.id.vCountCartCustomer_FragmentHome);
     }
 
 
