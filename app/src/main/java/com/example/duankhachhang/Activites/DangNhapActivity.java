@@ -6,13 +6,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.duankhachhang.Models.Customer;
+import com.example.duankhachhang.Home;
+import com.example.duankhachhang.Class.Customer;
 import com.example.duankhachhang.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -32,7 +34,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
@@ -59,16 +60,15 @@ public class DangNhapActivity extends AppCompatActivity {
         mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
             @Override
             public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
-                Log.d(TAG, "mã xác minh hoàng tất:" + phoneAuthCredential);
+                System.out.println("mã xác minh hoàng tất:" + phoneAuthCredential);
                 Toast.makeText(DangNhapActivity.this, "gửi mã thành công", Toast.LENGTH_SHORT).show();
                 signInWithPhoneAuthCredential(phoneAuthCredential);
             }
 
             @Override
             public void onVerificationFailed(@NonNull FirebaseException e) {
-                Log.w(TAG, "mã xác minh thất bại", e);
+                System.out.println("mã xác minh thất bại " + e);
                 Toast.makeText(DangNhapActivity.this, "gửi mã không thành công", Toast.LENGTH_SHORT).show();
-
                 if (e instanceof FirebaseAuthInvalidCredentialsException) {
                     Log.e(TAG,"yêu cầu không hợp lệ: " + e.getMessage());
                 } else if (e instanceof FirebaseTooManyRequestsException) {
@@ -77,14 +77,13 @@ public class DangNhapActivity extends AppCompatActivity {
                     Log.e(TAG,"Đã thử xác minh reCAPTCHA với Hoạt động rỗng: "+ e.getMessage());
                 }
             }
-
             @Override
             public void onCodeSent(@NonNull String s, @NonNull PhoneAuthProvider.ForceResendingToken forceResendingToken) {
                 super.onCodeSent(s, forceResendingToken);
-                Log.d(TAG, "onCodeSent:" + s);
                 mVerificationId = s;
                 mResendToken = forceResendingToken;
-                Log.d(TAG, "Token:" + mResendToken);
+                System.out.println("onCodeSent:" + s);
+                System.out.println("Token:" + mResendToken);
             }
         };
         setEvent();
@@ -106,31 +105,6 @@ public class DangNhapActivity extends AppCompatActivity {
                 if (phone.isEmpty() && code.isEmpty()){
                     Toast.makeText(DangNhapActivity.this, "banj chưa nhập đủ thông tin", Toast.LENGTH_SHORT).show();
                 }else {
-                    reference = firebaseDatabase.getReference("Customer").child(phone);
-                    reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            if (snapshot.exists()){
-                                Customer customer = snapshot.getValue(Customer.class);
-                                System.out.println(customer.toString());
-                                if (customer.getId()==phone){
-                                    SharedPreferences shePreferences = getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
-                                    SharedPreferences.Editor edit = shePreferences.edit();
-                                    Gson gson = new Gson();
-                                    String json = gson.toJson(customer);
-                                    System.out.println(json.toString());
-                                    edit.putString("informationUserCustomer", json);
-                                    edit.apply();
-                                }
-                            }else {
-                                System.out.println("không có dữ liệu");
-                            }
-                        }
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
                     verifyPhoneNumberWithCode(mVerificationId,code);
                 }
 
@@ -145,12 +119,12 @@ public class DangNhapActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        updateUI(currentUser);
-    }
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        updateUI(currentUser);
+//    }
 
     private void startPhoneNumberVerification(String phoneNumber) {
         PhoneAuthOptions options =
@@ -172,13 +146,11 @@ public class DangNhapActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Log.d(TAG, "signInWithCredential:       thành công");
-                            Toast.makeText(DangNhapActivity.this, "đăng nhập thành công", Toast.LENGTH_SHORT).show();
+                            System.out.println("Tag" + " : đăng nhập thành công");
                             FirebaseUser user = task.getResult().getUser();
                             updateUI(user);
                         } else {
-                            Log.w(TAG, "signInWithCredential:        thất bại", task.getException());
-
+                            System.out.println("Tag" + " : đăng nhập thất bại: " + task.getException());
                         }
                     }
                 });
@@ -196,15 +168,28 @@ public class DangNhapActivity extends AppCompatActivity {
         PhoneAuthProvider.verifyPhoneNumber(options);
     }
     private void updateUI(FirebaseUser user) {
+        String phone = user.getPhoneNumber();
         if (user != null){
-            String phone = user.getPhoneNumber();
-            if (phone.equals(ted_soDienThoai.getText().toString())){
-                startActivity(new Intent(DangNhapActivity.this, HomePageMainActivity.class));
-            }else {
-                Intent intent = new Intent(DangNhapActivity.this,NhapThongTinActivity.class);
-                intent.putExtra("phone",phone);
-                startActivity(intent);
-            }
+            reference = FirebaseDatabase.getInstance().getReference("Customer").child(phone);
+            reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()){
+                        Intent intent = new Intent(DangNhapActivity.this, Home.class);
+                        startActivity(intent);
+                        finish();
+                    }else {
+                        Intent intent = new Intent(DangNhapActivity.this, NhapThongTinActivity.class);
+                        intent.putExtra("phoneUser",phone);
+                        startActivity(intent);
+                        finish();
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
         }
     }
     private void setControll() {

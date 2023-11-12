@@ -1,8 +1,8 @@
-package com.example.duankhachhang.Models;
+package com.example.duankhachhang.Class;
 
 import java.io.Serializable;
 
-public class Product implements Serializable {
+public class ProductData implements Serializable {
     private String descriptionProduct;
     private String idProduct;
     private String idUserProduct;
@@ -14,10 +14,10 @@ public class Product implements Serializable {
     private int quanlityProduct;
     private int sumLike;
 
-    public Product() {
+    public ProductData() {
     }
 
-    public Product(String descriptionProduct, String idProduct, String idUserProduct, String keyCategoryProduct, String keyManufaceProduct, String nameProduct, int overageCmtProduct, int priceProduct, int quanlityProduct, int sumLike) {
+    public ProductData(String descriptionProduct, String idProduct, String idUserProduct, String keyCategoryProduct, String keyManufaceProduct, String nameProduct, int overageCmtProduct, int priceProduct, int quanlityProduct, int sumLike) {
         this.descriptionProduct = descriptionProduct;
         this.idProduct = idProduct;
         this.idUserProduct = idUserProduct;

@@ -1,4 +1,4 @@
-package com.example.duankhachhang.Models;
+package com.example.duankhachhang.Class;
 
 import java.io.Serializable;
 
