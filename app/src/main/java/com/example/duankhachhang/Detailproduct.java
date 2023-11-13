@@ -4,6 +4,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
@@ -76,9 +80,15 @@ public class Detailproduct extends AppCompatActivity {
     private boolean productIsOutOfStock = false;
     private boolean loadingFirt = false;
     private int countRelatedProducts = 0;
+    private SensorManager sensorManager;
+    private Sensor sensor;
+    private SensorEventListener sensorEventListener;
     private ArrayList<ProductData> arrRelatedProducts = new ArrayList<>();
+    private int ao = 0;
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     DatabaseReference databaseReference;
+
+
 
 
     @Override
@@ -138,6 +148,55 @@ public class Detailproduct extends AppCompatActivity {
         rcvRelatedProducts.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         rcvRelatedProducts.setAdapter(relatedProductsAdapter);
 
+        sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
+        if(sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null){
+            sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            sensorEventListener = new SensorEventListener() {
+                @Override
+                public void onSensorChanged(SensorEvent sensorEvent) {
+                    float x = sensorEvent.values[0];
+                    float y = sensorEvent.values[1];
+                    float z = sensorEvent.values[2];
+                    float acceleration = (float) Math.sqrt(x * x + y * y + z * z);
+                    if (acceleration> 30.0f) {
+                      if (ao == 0){
+                          isClickLike = !isClickLike;
+                          ao = 1;
+                          RequestBuilder<Drawable> requestBuilder = Glide.with(context).load(R.drawable.icon_love_animation);
+                          Target<Drawable> target = requestBuilder.into(ivLikeProduct_DetailProduct);
+                          new Handler().postDelayed(new Runnable() {
+                              @Override
+                              public void run() {
+                                  Glide.with(context).clear(target);
+                                  ivLikeProduct_DetailProduct.setImageResource(R.drawable.icon_love);
+                              }
+                          }, 1000);
+                          databaseReference = firebaseDatabase.getReference("LikeProduct");
+                          LikeProductData likeProductData = new LikeProductData(customer.getId(), productData.getIdProduct());
+                          databaseReference.child(customer.getId() + "/" + customer.getId() + productData.getIdProduct()).setValue(likeProductData);
+                          productData.setSumLike(productData.getSumLike() + 1);
+                          databaseReference = firebaseDatabase.getReference("Product");
+                          databaseReference.child(productData.getIdProduct()).setValue(productData);
+
+                      }
+                    }
+                }
+
+                @Override
+                public void onAccuracyChanged(Sensor sensor, int i) {
+
+                }
+            };
+            sensorManager.registerListener(sensorEventListener,sensor,SensorManager.SENSOR_DELAY_NORMAL);
+        }
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Huỷ đăng ký lắng nghe khi Activity bị huỷ
+        if (sensorManager != null && sensorEventListener != null) {
+            sensorManager.unregisterListener(sensorEventListener);
+        }
     }
 
     private void getImageProduct() {
@@ -186,13 +245,18 @@ public class Detailproduct extends AppCompatActivity {
 
     private void checkProductInCart() {
         databaseReference = firebaseDatabase.getReference("CartCustomer/" + customer.getId() + "/" + idProduct);
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     btnAddCart_DetailProduct.setText("Đã thêm giỏ hàng");
                     btnAddCart_DetailProduct.setBackgroundResource(R.drawable.bg_button_press_01);
                     isProductInCart = true;
+                }
+                else {
+                    btnAddCart_DetailProduct.setText("Thêm vào giỏ hàng");
+                    btnAddCart_DetailProduct.setBackgroundResource(R.drawable.event_press_button_01);
+                    isProductInCart = false;
                 }
             }
             @Override
@@ -304,6 +368,7 @@ public class Detailproduct extends AppCompatActivity {
                 vSumlike_DetailProduct.setEnabled(false);
                 isClickLike = !isClickLike;
                 if (!isClickLike) {
+                    ao = 0;
                     ivLikeProduct_DetailProduct.setImageResource(R.drawable.icon_nolove);
                     databaseReference = firebaseDatabase.getReference("LikeProduct");
                     databaseReference.child(customer.getId() + "/" + customer.getId() + productData.getIdProduct()).removeValue();
@@ -311,6 +376,7 @@ public class Detailproduct extends AppCompatActivity {
                     databaseReference = firebaseDatabase.getReference("Product");
                     databaseReference.child(productData.getIdProduct()).setValue(productData);
                 } else {
+                    ao = 1;
                     RequestBuilder<Drawable> requestBuilder = Glide.with(context).load(R.drawable.icon_love_animation);
                     Target<Drawable> target = requestBuilder.into(ivLikeProduct_DetailProduct);
                     new Handler().postDelayed(new Runnable() {
@@ -383,6 +449,7 @@ public class Detailproduct extends AppCompatActivity {
                                 public void onSuccess(Void unused) {
                                     btnAddCart_DetailProduct.setText("Đã thêm giỏ hàng");
                                     btnAddCart_DetailProduct.setBackgroundResource(R.drawable.bg_button_press_01);
+                                    Toast.makeText(context,"Thêm vào giỏ hàng thành công",Toast.LENGTH_SHORT).show();
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {

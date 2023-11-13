@@ -198,6 +198,13 @@ public class Buyproduct extends AppCompatActivity {
                                         AlertDialog alertDialog = builder.create();
                                         alertDialog.show();
                                     }
+
+                                }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        databaseReference = firebaseDatabase.getReference("CartCustomer/" + itemOrder.getIdCustomer_Order()+"/"+itemOrder.getIdProduct_Order());
+                                        databaseReference.removeValue();
+                                    }
                                 });
                                 Toast.makeText(context, "Đã mua hàng thành công",Toast.LENGTH_SHORT).show();
                                 finish();

@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -34,15 +35,22 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class CartCustomer_Adapter extends RecyclerView.Adapter<CartCustomer_ViewHolder> {
+    public  interface CartDataSelectionItem_CartCustomer{
+        public int getCartDataSelection(int position);
+        public int getCartDataSelection_Cancel(int positon);
+    }
+
+    private CartCustomer_Adapter.CartDataSelectionItem_CartCustomer cartDataSelectionItemCartCustomer;
     private ArrayList<CartData> arrCartData = new ArrayList<>();
     private Context context ;
     private Customer customer = new Customer();
 
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     DatabaseReference databaseReference;
-    public CartCustomer_Adapter(ArrayList<CartData> arrCartData, Context context){
+    public CartCustomer_Adapter(ArrayList<CartData> arrCartData, Context context, CartDataSelectionItem_CartCustomer cartDataSelectionItemCartCustomer){
         this.arrCartData = arrCartData;
         this.context = context;
+        this.cartDataSelectionItemCartCustomer = cartDataSelectionItemCartCustomer;
         customer = new Customer("0123456789", "demo address", "Demo", null);
     }
     @NonNull
@@ -65,6 +73,7 @@ public class CartCustomer_Adapter extends RecyclerView.Adapter<CartCustomer_View
                     quanlity ++;
                     cartData.setQuanlityProduct_Cart(quanlity);
                     setItemCart(cartData);
+                    holder.cbxSelectionItem.setChecked(false);
                 }
             }
         });
@@ -78,6 +87,19 @@ public class CartCustomer_Adapter extends RecyclerView.Adapter<CartCustomer_View
                     quanlity --;
                     cartData.setQuanlityProduct_Cart(quanlity);
                     setItemCart(cartData);
+                    holder.cbxSelectionItem.setChecked(false);
+                }
+            }
+        });
+
+        holder.cbxSelectionItem.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b){
+                   cartDataSelectionItemCartCustomer.getCartDataSelection(holder.getAdapterPosition());
+                }
+                else {
+                    cartDataSelectionItemCartCustomer.getCartDataSelection_Cancel(holder.getAdapterPosition());
                 }
             }
         });

@@ -50,4 +50,8 @@ dependencies {
     implementation("com.squareup.picasso:picasso:2.8")
     implementation ("com.github.bumptech.glide:glide:4.12.0")
     implementation ("de.hdodenhof:circleimageview:3.1.0")
+    implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    implementation("com.google.firebase:firebase-messaging")
+    implementation ("com.facebook.android:facebook-login:latest.release")
+    implementation ("com.facebook.android:facebook-android-sdk:[8,9)")
 }
