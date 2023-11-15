@@ -1,5 +1,13 @@
 package com.example.duankhachhang;
 
+<<<<<<< HEAD
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+
+public class CartCustomer extends AppCompatActivity {
+
+=======
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -60,10 +68,13 @@ public class CartCustomer extends AppCompatActivity {
     private int allPrice = 0;
     private Runnable runnable = null;
 
+>>>>>>> vuanh
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart_customer);
+<<<<<<< HEAD
+=======
         context = this;
         setControl();
         setIntiazational();
@@ -280,5 +291,6 @@ public class CartCustomer extends AppCompatActivity {
         toolBar_CartCustomer = findViewById(R.id.toolBar_CartCustomer);
         tvAllPrice_ItemOrderSelection = findViewById(R.id.tvAllPrice_ItemOrderSelection);
         btnBuyProduct_CartCustomer = findViewById(R.id.btnBuyProduct_CartCustomer);
+>>>>>>> vuanh
     }
 }

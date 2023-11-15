@@ -18,7 +18,11 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
+<<<<<<< HEAD
+                                      <entry key="url" value="file:/$USER_HOME$/AppData/Local/Android/Sdk/icons/material/materialicons/arrow_back/baseline_arrow_back_24.xml" />
+=======
                                       <entry key="url" value="file:/$USER_HOME$/AppData/Local/Android/Sdk/icons/material/materialicons/edit/baseline_edit_24.xml" />
+>>>>>>> vuanh
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -28,8 +32,13 @@
                         </option>
                         <option name="values">
                           <map>
+<<<<<<< HEAD
+                            <entry key="color" value="050505" />
+                            <entry key="outputName" value="ic_arrow_back" />
+=======
                             <entry key="color" value="020202" />
                             <entry key="outputName" value="icon_edit" />
+>>>>>>> vuanh
                             <entry key="sourceFile" value="C:\Users\Admin\Documents\GitHub\duan_khachhang" />
                           </map>
                         </option>

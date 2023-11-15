@@ -40,7 +40,11 @@ public class ProductBanerAdapter extends PagerAdapter {
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
 //        View view = LayoutInflater.from(context).inflate(R.layout.customer_productitem_screenhome,null);
         ImageView imageView = new ImageView(context);
+<<<<<<< HEAD
+        imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+=======
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+>>>>>>> vuanh
         Picasso.get().load(arrUrl.get(position)).into(imageView);
         container.addView(imageView);
         return imageView;

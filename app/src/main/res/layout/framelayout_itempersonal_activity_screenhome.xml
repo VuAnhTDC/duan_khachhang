@@ -1,4 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
+<<<<<<< HEAD
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@drawable/top_background">
+    </LinearLayout>
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/img_customer"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="center"
+        android:src="#ffff"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="100dp"
+        app:layout_constraintStart_toStartOf="parent" />
+    <ImageView
+        android:id="@+id/img_add_photo"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="@drawable/ic_add_a_photo"
+        app:layout_constraintStart_toEndOf="@+id/img_customer"
+        app:layout_constraintBottom_toTopOf="@+id/tv_name_customer"
+        android:layout_margin="8dp"/>
+    <TextView
+        android:id="@+id/tv_name_customer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="nguyễn văn nhật"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:maxLines="1"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@+id/img_customer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="5dp"/>
+
+<Button
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/btn_purchase_order"
+    android:background="#72EF2F"
+    android:text="Đơn Mua"
+    android:layout_marginStart="25dp"
+    android:layout_marginEnd="25dp"
+    app:layout_constraintTop_toBottomOf="@+id/tv_name_customer"
+    app:layout_constraintBottom_toTopOf="@+id/btn_like_product"
+    android:layout_marginTop="20dp"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_like_product"
+        android:background="#72EF2F"
+        android:text="Sản Phẩm Đã Thích"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        app:layout_constraintTop_toBottomOf="@+id/btn_purchase_order"
+        app:layout_constraintBottom_toTopOf="@+id/btn_setting_address"
+        android:layout_marginTop="20dp"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_setting_address"
+        android:background="#72EF2F"
+        android:text="Cài Đặt Dịa Chỉ"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        app:layout_constraintTop_toBottomOf="@+id/btn_like_product"
+        app:layout_constraintBottom_toTopOf="@+id/btn_Log_out"
+        android:layout_marginTop="20dp"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_Log_out"
+        android:background="#72EF2F"
+        android:text="Đăng Xuất"
+        android:layout_marginStart="25dp"
+        android:layout_marginEnd="25dp"
+        app:layout_constraintTop_toBottomOf="@+id/btn_setting_address"
+        android:layout_marginTop="20dp"/>
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+=======
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,3 +107,4 @@
         />
 
 </LinearLayout>
+>>>>>>> vuanh

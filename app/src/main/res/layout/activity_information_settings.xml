@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".InformationSettings">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout_InformationSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/topAppBar_like_product"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:title="Thay Đổi Thông Tin" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout_InformationSetting"
+        android:layout_marginTop="-300dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="vertical">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_HoTen_InformationSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:hint=" nhập họ và tên"
+            app:errorIconDrawable="@drawable/error"
+            app:startIconDrawable="@drawable/ic_name">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/ted_HoTen_InformationSetting"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/edit_text_background" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/til_DiaChi_InformationSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginRight="20dp"
+            android:hint=" nhập địa chỉ nhận hàng"
+            app:boxStrokeErrorColor="?attr/colorError"
+            app:errorEnabled="true"
+            app:errorIconDrawable="@drawable/error"
+            app:helperText="Lưu Ý: nhập đúng địa chỉ nhận hàng"
+            app:helperTextTextColor="#C80202"
+            app:startIconDrawable="@drawable/id_location">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/ted_DiaChi_InformationSetting"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/edit_text_background" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <View
+            android:layout_width="380dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:layout_gravity="center"
+            android:background="@drawable/line"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_xacNhan_InformationSetting"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:text="Xác Nhận"
+            android:textStyle="bold"
+            android:background="@drawable/button"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

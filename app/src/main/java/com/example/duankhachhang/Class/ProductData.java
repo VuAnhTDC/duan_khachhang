@@ -3,20 +3,34 @@ package com.example.duankhachhang.Class;
 import java.io.Serializable;
 
 public class ProductData implements Serializable {
-    private String keyProductItem;
+    private String descriptionProduct;
     private String idProduct;
-    private String nameProduct;
-    private int priceProduct;
+    private String idUserProduct;
     private String keyCategoryProduct;
     private String keyManufaceProduct;
-    private int quanlityProduct;
-    private String descriptionProduct;
-    private int sumLike;
+    private String nameProduct;
     private int overageCmtProduct;
-    private String idUserProduct;
+    private int priceProduct;
+    private int quanlityProduct;
+    private int sumLike;
+    private String keyProductItem;
 
     public ProductData() {
     }
+
+    public ProductData(String descriptionProduct, String idProduct, String idUserProduct, String keyCategoryProduct, String keyManufaceProduct, String nameProduct, int overageCmtProduct, int priceProduct, int quanlityProduct, int sumLike) {
+        this.descriptionProduct = descriptionProduct;
+        this.idProduct = idProduct;
+        this.idUserProduct = idUserProduct;
+        this.keyCategoryProduct = keyCategoryProduct;
+        this.keyManufaceProduct = keyManufaceProduct;
+        this.nameProduct = nameProduct;
+        this.overageCmtProduct = overageCmtProduct;
+        this.priceProduct = priceProduct;
+        this.quanlityProduct = quanlityProduct;
+        this.sumLike = sumLike;
+    }
+
 
     public String getKeyProductItem() {
         return keyProductItem;
@@ -34,34 +48,6 @@ public class ProductData implements Serializable {
         this.idProduct = idProduct;
     }
 
-    public String getNameProduct() {
-        return nameProduct;
-    }
-
-    public void setNameProduct(String nameProduct) {
-        this.nameProduct = nameProduct;
-    }
-
-//    public String getUrlImageProduct() {
-//        return urlImageProduct;
-//    }
-//
-//    public void setUrlImageProduct(String urlImageProduct) {
-//        this.urlImageProduct = urlImageProduct;
-//    }
-
-    public int getPriceProduct() {
-        return priceProduct;
-    }
-
-    public void setPriceProduct(int priceProduct) {
-        this.priceProduct = priceProduct;
-    }
-
-    public String getKeyCategoryProduct() {
-        return keyCategoryProduct;
-    }
-
     public void setKeyCategoryProduct(String keyCategoryProduct) {
         this.keyCategoryProduct = keyCategoryProduct;
     }
@@ -74,28 +60,19 @@ public class ProductData implements Serializable {
         this.keyManufaceProduct = keyManufaceProduct;
     }
 
-    public int getQuanlityProduct() {
-        return quanlityProduct;
+    public String getNameProduct() {
+        return nameProduct;
     }
 
-    public void setQuanlityProduct(int quanlityProduct) {
-        this.quanlityProduct = quanlityProduct;
+    public void setNameProduct(String nameProduct) {
+        this.nameProduct = nameProduct;
     }
-
     public String getDescriptionProduct() {
         return descriptionProduct;
     }
 
     public void setDescriptionProduct(String descriptionProduct) {
         this.descriptionProduct = descriptionProduct;
-    }
-
-    public int getSumLike() {
-        return sumLike;
-    }
-
-    public void setSumLike(int sumLike) {
-        this.sumLike = sumLike;
     }
 
     public int getOverageCmtProduct() {
@@ -106,7 +83,27 @@ public class ProductData implements Serializable {
         this.overageCmtProduct = overageCmtProduct;
     }
 
-    public ProductData(String idProduct, String nameProduct,  int priceProduct, String keyCategoryProduct, String keyManufaceProduct, int quanlityProduct, String descriptionProduct, int sumLike, int overageCmtProduct, String idUserProduct) {
+    public int getPriceProduct() {
+        return priceProduct;
+    }
+
+    public void setPriceProduct(int priceProduct) {
+        this.priceProduct = priceProduct;
+    }
+
+    public void setQuanlityProduct(int quanlityProduct) {
+        this.quanlityProduct = quanlityProduct;
+    }
+
+    public int getSumLike() {
+        return sumLike;
+    }
+
+    public void setSumLike(int sumLike) {
+        this.sumLike = sumLike;
+    }
+
+    public ProductData(String idProduct, String nameProduct, int priceProduct, String keyCategoryProduct, String keyManufaceProduct, int quanlityProduct, String descriptionProduct, int sumLike, int overageCmtProduct, String idUserProduct) {
         this.idProduct = idProduct;
         this.nameProduct = nameProduct;
 //        this.urlImageProduct = urlImageProduct;
@@ -142,5 +139,10 @@ public class ProductData implements Serializable {
                 ", overageCmtProduct=" + overageCmtProduct +
                 ", idUser_Product='" + idUserProduct.toString() + '\'' +
                 '}';
+
+    }
+
+
+    public void getQuanlityProduct() {
     }
 }

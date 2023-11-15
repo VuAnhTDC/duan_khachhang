@@ -1,5 +1,13 @@
 package com.example.duankhachhang;
 
+<<<<<<< HEAD
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+
+public class DetailShop extends AppCompatActivity {
+
+=======
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -52,10 +60,13 @@ public class DetailShop extends AppCompatActivity {
     SwipeRefreshLayout swipFresh;
     private String linkFaceBookShop = "";
 
+>>>>>>> vuanh
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_shop);
+<<<<<<< HEAD
+=======
         context = this;
         setControl();
         setIntiazation();
@@ -213,5 +224,6 @@ public class DetailShop extends AppCompatActivity {
         swipFresh = findViewById(R.id.swipFresh);
         vFaceBook_DetailShop = findViewById(R.id.vFaceBook_DetailShop);
         tvLinkFacebook_DetailShop = findViewById(R.id.tvLinkFacebook_DetailShop);
+>>>>>>> vuanh
     }
 }

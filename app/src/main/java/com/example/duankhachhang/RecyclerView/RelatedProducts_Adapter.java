@@ -77,16 +77,38 @@ public class RelatedProducts_Adapter extends RecyclerView.Adapter<RealtedProduct
 
     private void isLoadingImageProductItem(ProductData productDataItem,RealtedProducts_ViewHolder holder){
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference databaseReference = firebaseDatabase.getReference("ImageProducts/" + productDataItem.getIdProduct() +"/1");
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+<<<<<<< HEAD
+        DatabaseReference databaseReference = firebaseDatabase.getReference("ImageProducts");
+        Query query = databaseReference.orderByChild("idProduct").equalTo(productDataItem.getIdProduct());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()){
-                   String urlImage = snapshot.child("urlImage").getValue().toString();
-                    Picasso.get().load(urlImage).into(holder.ivProductItem_RelatedProducts);
+                    for (DataSnapshot imageItem:
+                            snapshot.getChildren()) {
+                        Image image = imageItem.getValue(Image.class);
+                        Picasso.get().load(image.getUrlImage()).into(holder.ivProductItem_RelatedProducts);
+                        return;
+                    }
+                }
+            }
+=======
+        DatabaseReference databaseReference = firebaseDatabase.getReference("ImageProducts");
+        Query query = databaseReference.orderByChild("idProduct").equalTo(productDataItem.getIdProduct());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    for (DataSnapshot imageItem:
+                            snapshot.getChildren()) {
+                        Image image = imageItem.getValue(Image.class);
+                        Picasso.get().load(image.getUrlImage()).into(holder.ivProductItem_RelatedProducts);
+                        return;
+                    }
                 }
             }
 
+>>>>>>> vuanh
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
