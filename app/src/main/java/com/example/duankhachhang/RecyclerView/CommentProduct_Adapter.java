@@ -29,7 +29,7 @@ public class CommentProduct_Adapter extends RecyclerView.Adapter<CommentProduct_
     DatabaseReference databaseReference;
     public  CommentProduct_Adapter(Context context,ArrayList<CommentData> arrCommentProduct){
         this.context = context;
-        this.arrCommentProduct = arrCommentProduct;
+     this.arrCommentProduct = arrCommentProduct;
     }
 
     @NonNull

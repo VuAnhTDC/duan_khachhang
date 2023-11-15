@@ -85,9 +85,8 @@ public class CommentProductDialogFragment extends DialogFragment {
     @Override
     public void onStart() {
         super.onStart();
-        int width = 350 ;
-        int height = 500;
+        int width = getResources().getDimensionPixelSize(R.dimen.dialog_width); // Sử dụng giá trị kích thước từ resources
+        int height = getResources().getDimensionPixelSize(R.dimen.dialog_height);
         getDialog().getWindow().setLayout(width,height);
     }
-
 }

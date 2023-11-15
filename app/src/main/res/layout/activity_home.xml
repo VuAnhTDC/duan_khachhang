@@ -4,28 +4,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F3EFEF"
     tools:context=".Home">
 
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
     <FrameLayout
+        android:id="@+id/framelayout_screenhome"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <FrameLayout
-            android:id="@+id/framelayout_screenhome"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
-        <!--        Button navigaiton bar-->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="bottom">
+        android:layout_height="match_parent"/>
+    <!--        Button navigaiton bar-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom">
 
-            <com.google.android.material.bottomnavigation.BottomNavigationView
-                android:id="@+id/bottomNavigationBar_Home"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_bottomnavigationbar"
-                app:menu="@menu/bottomnavigationbar"
-                />
-        </LinearLayout></FrameLayout>
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigationBar_Home"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_bottomnavigationbar"
+            app:menu="@menu/bottomnavigationbar"
+            />
+    </LinearLayout></FrameLayout>
+
+
 
 </LinearLayout>

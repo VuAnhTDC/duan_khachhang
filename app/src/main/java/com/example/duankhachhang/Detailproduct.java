@@ -3,7 +3,6 @@ package com.example.duankhachhang;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -49,7 +48,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
@@ -98,10 +96,7 @@ public class Detailproduct extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailproduct);
         context = this;
-        SharedPreferences sharedPreferences1 = getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
-        String jsonCustomer = sharedPreferences1.getString("informationUserCustomer", "");
-        Gson gson = new Gson();
-        customer = gson.fromJson(jsonCustomer, Customer.class);
+        customer = new Customer("0123456789", "demo address", "Demo", null);
         setControl();
         setIniazation();
         getDataProduct();
@@ -164,26 +159,26 @@ public class Detailproduct extends AppCompatActivity {
                     float z = sensorEvent.values[2];
                     float acceleration = (float) Math.sqrt(x * x + y * y + z * z);
                     if (acceleration> 30.0f) {
-                        if (ao == 0){
-                            isClickLike = !isClickLike;
-                            ao = 1;
-                            RequestBuilder<Drawable> requestBuilder = Glide.with(context).load(R.drawable.icon_love_animation);
-                            Target<Drawable> target = requestBuilder.into(ivLikeProduct_DetailProduct);
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Glide.with(context).clear(target);
-                                    ivLikeProduct_DetailProduct.setImageResource(R.drawable.icon_love);
-                                }
-                            }, 1000);
-                            databaseReference = firebaseDatabase.getReference("LikeProduct");
-                            LikeProductData likeProductData = new LikeProductData(customer.getId(), productData.getIdProduct());
-                            databaseReference.child(customer.getId() + "/" + customer.getId() + productData.getIdProduct()).setValue(likeProductData);
-                            productData.setSumLike(productData.getSumLike() + 1);
-                            databaseReference = firebaseDatabase.getReference("Product");
-                            databaseReference.child(productData.getIdProduct()).setValue(productData);
+                      if (ao == 0){
+                          isClickLike = !isClickLike;
+                          ao = 1;
+                          RequestBuilder<Drawable> requestBuilder = Glide.with(context).load(R.drawable.icon_love_animation);
+                          Target<Drawable> target = requestBuilder.into(ivLikeProduct_DetailProduct);
+                          new Handler().postDelayed(new Runnable() {
+                              @Override
+                              public void run() {
+                                  Glide.with(context).clear(target);
+                                  ivLikeProduct_DetailProduct.setImageResource(R.drawable.icon_love);
+                              }
+                          }, 1000);
+                          databaseReference = firebaseDatabase.getReference("LikeProduct");
+                          LikeProductData likeProductData = new LikeProductData(customer.getId(), productData.getIdProduct());
+                          databaseReference.child(customer.getId() + "/" + customer.getId() + productData.getIdProduct()).setValue(likeProductData);
+                          productData.setSumLike(productData.getSumLike() + 1);
+                          databaseReference = firebaseDatabase.getReference("Product");
+                          databaseReference.child(productData.getIdProduct()).setValue(productData);
 
-                        }
+                      }
                     }
                 }
 
@@ -205,17 +200,15 @@ public class Detailproduct extends AppCompatActivity {
     }
 
     private void getImageProduct() {
-        databaseReference = firebaseDatabase.getReference("ImageProducts");
-        Query query = databaseReference.orderByChild("idProduct").equalTo(productData.getIdProduct());
-        query.addValueEventListener(new ValueEventListener() {
+        databaseReference = firebaseDatabase.getReference("ImageProducts/"+idProduct);
+        databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     for (DataSnapshot imageItem :
                             snapshot.getChildren()) {
-                        Image image = imageItem.getValue(Image.class);
-                        arrUrlImage.add(image.getUrlImage());
-                        productBanerAdapter.notifyDataSetChanged();
+                            arrUrlImage.add(imageItem.child("urlImage").getValue().toString());
+                            productBanerAdapter.notifyDataSetChanged();
                     }
                 }
             }
@@ -485,6 +478,14 @@ public class Detailproduct extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(context, DetailShop.class);
                 intent.putExtra("idShop", productData.getIdUserProduct());
+                startActivity(intent);
+            }
+        });
+        ivChatShop_DetailProduct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, MessageActivity.class);
+                intent.putExtra("idUser",productData.getIdUserProduct());
                 startActivity(intent);
             }
         });

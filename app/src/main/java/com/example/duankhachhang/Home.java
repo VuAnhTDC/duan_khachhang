@@ -6,12 +6,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 
 import com.example.duankhachhang.Class.Customer;
+import com.example.duankhachhang.Class.Image;
 import com.example.duankhachhang.Class.ProductData;
 import com.example.duankhachhang.Fragment.Fragment_home_screenHome;
 import com.example.duankhachhang.Fragment.Fragment_message_screenHome;
@@ -41,33 +41,26 @@ public class Home extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         context = this;
-        //Intent intent = getIntent();
-        //customer = (Customer)intent.getSerializableExtra("customer");
-        //System.out.println("thông tin customer lấy từ activity : " + customer.toString());
-        getDataProduct();
+        customer = new Customer("0123456789", "demo address", "Demo", null);
         setControl();
         setEvent();
+        loadingFragment(new Fragment_home_screenHome());
     }
 
     private void setEvent() {
         bottomNavigationBar_Home.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Fragment fragment = null;
-                if (item.getItemId() == R.id.itemHome_Navigationbar) {
-                    //fragment = new Fragment_home_screenHome(arrProduct);
-                } else if (item.getItemId() == R.id.itemMessage_Navigationbar) {
-                    fragment = new Fragment_message_screenHome();
-                } else if (item.getItemId() == R.id.itemPersonal_Navigationbar) {
-                    Fragment_personal_screenHome fragmentPersonal = new Fragment_personal_screenHome();
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable("customer", customer);
-                    fragmentPersonal.setArguments(bundle);
-                    fragment = fragmentPersonal;
+                if(item.getItemId() == R.id.itemHome_Navigationbar){
+                    loadingFragment(new Fragment_home_screenHome());
+                    return true;
                 }
-
-                if (fragment != null) {
-                    loadingFragment(fragment);
+                else  if (item.getItemId() == R.id.itemMessage_Navigationbar){
+                    loadingFragment(new Fragment_message_screenHome());
+                    return true;
+                }
+                else if (item.getItemId() == R.id.itemPersonal_Navigationbar){
+                    loadingFragment(new Fragment_personal_screenHome());
                     return true;
                 }
                 return false;
@@ -86,29 +79,29 @@ public class Home extends AppCompatActivity {
         fragmentTransaction.replace(framelayout_screenhome.getId(),fragmentLoading);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
-
     }
 
-    private void getDataProduct(){
-        databaseReference = firebaseDatabase.getReference("ProductData");
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                Fragment_home_screenHome fragmentHomeScreenHome = new Fragment_home_screenHome();
-//                loadingFragment(fragmentHomeScreenHome);
-                if (snapshot.exists()) {
-                    for (DataSnapshot productItem : snapshot.getChildren()) {
-                        ProductData productData = productItem.getValue(ProductData.class);
-                        arrProduct.add(productData);
-                        //loadingFragment(new Fragment_home_screenHome(arrProduct));
-                    }
-                }
-            }
+//    private void getDataProduct(){
+//        databaseReference = firebaseDatabase.getReference("Product");
+//        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+////                Fragment_home_screenHome fragmentHomeScreenHome = new Fragment_home_screenHome();
+////                loadingFragment(fragmentHomeScreenHome);
+//                if (snapshot.exists()) {
+//                    for (DataSnapshot productItem : snapshot.getChildren()) {
+//                        ProductData productData = productItem.getValue(ProductData.class);
+//                        arrProduct.add(productData);
+//                        loadingFragment(new Fragment_home_screenHome(arrProduct));
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//                System.out.println("Lối lấy danh sách sản phẩm");
+//            }
+//        });
+//    }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                System.out.println("Lối lấy danh sách sản phẩm");
-            }
-        });
-    }
 }

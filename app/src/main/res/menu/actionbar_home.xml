@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/itemdiscountCode_ActionbarHome"
+        android:title="Discount code"
+        android:icon="@drawable/icon_discountcode"
+        app:showAsAction="always"
+        />
+    <item android:id="@+id/itemCart_ActionbarHome"
+        android:title="Shopping cart"
+        android:icon="@drawable/icon_cart"
+        app:showAsAction="always"
+        />
+    <item android:id="@+id/itemNotification_ActionbarHome"
+        android:title="discountCode"
+        android:icon="@drawable/icon_notification"
+        app:showAsAction="always"
+        />
+
+</menu>
