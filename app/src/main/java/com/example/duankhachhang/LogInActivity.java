@@ -1,4 +1,4 @@
-package com.example.duankhachhang.Activites;
+package com.example.duankhachhang;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -6,16 +6,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.duankhachhang.Home;
 import com.example.duankhachhang.Class.Customer;
-import com.example.duankhachhang.R;
+import com.example.duankhachhang.Class.ShowMessage;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
@@ -34,41 +32,70 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
+import android.view.inputmethod.InputMethodManager;
+
 import java.util.concurrent.TimeUnit;
 
-public class DangNhapActivity extends AppCompatActivity {
-    private static final String TAG = "DangNhapActivity";
+public class LogInActivity extends AppCompatActivity {
+    private static final String TAG = "LogInActivity";
     TextInputLayout til_soDienThoai, til_OTP;
     TextInputEditText ted_soDienThoai, ted_OTP;
     Button btn_xacNhan,btn_resendOTP,btn_gui;
     private FirebaseAuth mAuth;
     private String mVerificationId;
     private DatabaseReference reference;
+    private Context context;
     private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
+    private boolean isLogin = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dang_nhap);
+        setContentView(R.layout.activity_log_in);
         setControll();
-        mAuth = FirebaseAuth.getInstance();
+        setEvent();
+        context = this;
+        ShowMessage.context = this;
+    }
 
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        if (isLogin()){
+//            startActivity(new Intent(this, Home.class));
+//        }else {
+//            startActivity(new Intent(this, LogInActivity.class));
+//        }
+//    }
+    private boolean isLogin(){
+        SharedPreferences sharedPreferences = getSharedPreferences("UserLogin",Context.MODE_PRIVATE);
+        boolean login = sharedPreferences.getBoolean("isLogin",false);
+        if (login){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    private void setEvent() {
+        mAuth = FirebaseAuth.getInstance();
         mCallbacks = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
             @Override
             public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
                 System.out.println("mã xác minh hoàng tất:" + phoneAuthCredential);
-                Toast.makeText(DangNhapActivity.this, "gửi mã thành công", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LogInActivity.this, "gửi mã thành công", Toast.LENGTH_SHORT).show();
                 signInWithPhoneAuthCredential(phoneAuthCredential);
             }
 
             @Override
             public void onVerificationFailed(@NonNull FirebaseException e) {
                 System.out.println("mã xác minh thất bại " + e);
-                Toast.makeText(DangNhapActivity.this, "gửi mã không thành công", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LogInActivity.this, "gửi mã không thành công", Toast.LENGTH_SHORT).show();
                 if (e instanceof FirebaseAuthInvalidCredentialsException) {
                     Log.e(TAG,"yêu cầu không hợp lệ: " + e.getMessage());
                 } else if (e instanceof FirebaseTooManyRequestsException) {
@@ -86,10 +113,7 @@ public class DangNhapActivity extends AppCompatActivity {
                 System.out.println("Token:" + mResendToken);
             }
         };
-        setEvent();
-    }
 
-    private void setEvent() {
         btn_gui.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -103,7 +127,7 @@ public class DangNhapActivity extends AppCompatActivity {
                 final String phone = ted_soDienThoai.getText().toString();
                 final String code = ted_OTP.getText().toString();
                 if (phone.isEmpty() && code.isEmpty()){
-                    Toast.makeText(DangNhapActivity.this, "banj chưa nhập đủ thông tin", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LogInActivity.this, "bạn chưa nhập đủ thông tin", Toast.LENGTH_SHORT).show();
                 }else {
                     verifyPhoneNumberWithCode(mVerificationId,code);
                 }
@@ -118,13 +142,6 @@ public class DangNhapActivity extends AppCompatActivity {
             }
         });
     }
-
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        FirebaseUser currentUser = mAuth.getCurrentUser();
-//        updateUI(currentUser);
-//    }
 
     private void startPhoneNumberVerification(String phoneNumber) {
         PhoneAuthOptions options =
@@ -168,28 +185,64 @@ public class DangNhapActivity extends AppCompatActivity {
         PhoneAuthProvider.verifyPhoneNumber(options);
     }
     private void updateUI(FirebaseUser user) {
-        String phone = user.getPhoneNumber();
         if (user != null){
-            reference = FirebaseDatabase.getInstance().getReference("Customer").child(phone);
-            reference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (snapshot.exists()){
-                        Intent intent = new Intent(DangNhapActivity.this, Home.class);
-                        startActivity(intent);
-                        finish();
-                    }else {
-                        Intent intent = new Intent(DangNhapActivity.this, NhapThongTinActivity.class);
-                        intent.putExtra("phoneUser",phone);
-                        startActivity(intent);
-                        finish();
+            String phoneNumber = user.getPhoneNumber();
+            System.out.println("updateUI  phoneNumber: " + phoneNumber);
+            String phone = "0"+phoneNumber.substring(3);
+            System.out.println("updateUI  phone: " + phone);
+            if (phone != null){
+                reference = firebaseDatabase.getReference("Customer/"+phone);
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()){
+                            isLogin = true;
+                            Customer customer1 = snapshot.getValue(Customer.class);
+                            System.out.println("updateUI  customer: " + customer1.toString());
+                            SharedPreferences shePreferencesCustomer = getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
+                            SharedPreferences shePreferencesLogin = getSharedPreferences("UserLogin", Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editCustomer = shePreferencesCustomer.edit();
+                            SharedPreferences.Editor editLogin = shePreferencesLogin.edit();
+                            Gson gson = new Gson();
+                            String json = gson.toJson(customer1);
+                            System.out.println(json.toString());
+                            editCustomer.putString("informationUserCustomer", json);
+                            editCustomer.putString("numberphone", customer1.getId());
+                            editCustomer.putString("name", customer1.getName());
+                            editCustomer.putString("image", customer1.getImageUser());
+                            editCustomer.putString("address", customer1.getAddress());
+                            editCustomer.commit();
+                            editCustomer.apply();
+                            editLogin.putBoolean("isLogin", isLogin);
+                            editLogin.commit();
+                            editLogin.apply();
+                            Intent intent = new Intent(LogInActivity.this, Home.class);
+                            intent.putExtra("customer",customer1);
+                            startActivity(intent);
+                            finish();
+                        }else {
+                            System.out.println("updateUI  dữ liệu không tồn tại ");
+                            Intent intent = new Intent(LogInActivity.this, EnterInformationActivity.class);
+                            intent.putExtra("phoneUser", ted_soDienThoai.getText().toString());
+                            startActivity(intent);
+                            finish();
+                        }
                     }
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
 
-                }
-            });
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+        }
+    }
+
+    private void hideKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
     private void setControll() {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_width="150dp"
+    android:layout_height="250dp"
     android:layout_marginHorizontal="5dp"
     android:layout_marginVertical="5dp"
     android:background="@drawable/bg_container_productitem"
@@ -15,7 +15,7 @@
         android:layout_marginVertical="10dp">
 
         <ImageView
-            android:id="@+id/ivProductItem_RecyclerViewProductList"
+            android:id="@+id/ivProductItem_RelatedProducts"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerInside"
@@ -25,11 +25,11 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
+        android:layout_marginHorizontal="5dp"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tvNameProductItem_RecyclerViewProductList"
+            android:id="@+id/tvNameProductItem_RelatedProducts"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
@@ -40,10 +40,10 @@
             android:textStyle="bold|italic" />
 
         <TextView
-            android:id="@+id/tvPriceProductItem_RecyclerViewProductList"
+            android:id="@+id/tvPriceProductItem_RelatedProducts"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="2.000.000 VND"
+            android:text="2.000.000"
             android:textColor="#F80000"
             android:textSize="16dp"
             android:textStyle="bold" />
@@ -61,7 +61,7 @@
                 android:orientation="vertical"
                 >
                 <TextView
-                    android:id="@+id/tvStarProductItem_RecyclerViewProductList"
+                    android:id="@+id/tvStarProductItem_RelatedProducts"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/icon_love"
@@ -71,7 +71,7 @@
                     android:text="2.3"
                     />
                 <TextView
-                    android:id="@+id/tvCmtProductItem_RecyclerViewProductList"
+                    android:id="@+id/tvCmtProductItem_RelatedProducts"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:drawableLeft="@drawable/icon_comment"
@@ -85,7 +85,7 @@
             </LinearLayout>
 
             <TextView
-                android:id="@+id/tvAddressShopProductItem_RecyclerViewProductList"
+                android:id="@+id/tvAddressShopProductItem_RelatedProducts"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

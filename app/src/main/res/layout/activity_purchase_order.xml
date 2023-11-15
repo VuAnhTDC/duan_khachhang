@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".PurchaseOrder"
+    android:id="@+id/linearLayout_OrderList"
+    >
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolBar_OrderList_Purchase"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="Đơn Đặt Hàng"
+                android:background="#FFFFFF"
+                />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#B0B0B0"/>
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabLayout_ScreenOrderList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:tabSelectedTextColor="#FF5722"/>
+
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/viewPager_ScreenOrderList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+        </LinearLayout>
+    </FrameLayout>
+
+</LinearLayout>

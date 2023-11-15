@@ -20,16 +20,28 @@
         android:theme="@style/Theme.Duankhachhang"
         tools:targetApi="31">
         <activity
-            android:name=".LikedproductActivity"
+            android:name=".InformationSettings"
+            android:exported="false" />
+        <activity
+            android:name=".PurchaseOrder"
+            android:exported="false" />
+        <activity
+            android:name=".CartCustomer"
+            android:exported="false" />
+        <activity
+            android:name=".Buyproduct"
+            android:exported="false" />
+        <activity
+            android:name=".Detailproduct"
+            android:exported="false" />
+        <activity
+            android:name=".Likedproduct"
             android:exported="false" />
         <activity
             android:name=".Home"
             android:exported="false" />
         <activity
-            android:name=".Activites.HomePageMainActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Activites.NhapThongTinActivity"
+            android:name=".EnterInformationActivity"
             android:exported="true" />
 
         <receiver
@@ -42,7 +54,7 @@
         </receiver>
 
         <activity
-            android:name=".Activites.DangNhapActivity"
+            android:name=".LogInActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustNothing">
             <intent-filter>
@@ -52,7 +64,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Activites.MainActivity"
+            android:name=".MainActivity"
             android:exported="false" />
     </application>
 

@@ -13,15 +13,16 @@
         app:layout_constraintStart_toStartOf="parent"
         android:background="@drawable/top_background">
     </LinearLayout>
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/img_customer"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:background="@drawable/sanpham"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="center"
+        android:src="#ffff"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="100dp" />
+        android:layout_marginTop="100dp"
+        app:layout_constraintStart_toStartOf="parent" />
     <ImageView
         android:id="@+id/img_add_photo"
         android:layout_width="20dp"

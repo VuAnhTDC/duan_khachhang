@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
@@ -40,9 +41,9 @@ public class Home extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         context = this;
-//        Intent intent = getIntent();
-//        customer = (Customer)intent.getSerializableExtra("informationCustomer");
-        customer = new Customer("0123456789", "demo address", "Demo", null);
+        //Intent intent = getIntent();
+        //customer = (Customer)intent.getSerializableExtra("customer");
+        //System.out.println("thông tin customer lấy từ activity : " + customer.toString());
         getDataProduct();
         setControl();
         setEvent();
@@ -52,16 +53,21 @@ public class Home extends AppCompatActivity {
         bottomNavigationBar_Home.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                if(item.getItemId() == R.id.itemHome_Navigationbar){
-                    //loadingFragment(new Fragment_home_screenHome(arrProduct));
-                    return true;
+                Fragment fragment = null;
+                if (item.getItemId() == R.id.itemHome_Navigationbar) {
+                    //fragment = new Fragment_home_screenHome(arrProduct);
+                } else if (item.getItemId() == R.id.itemMessage_Navigationbar) {
+                    fragment = new Fragment_message_screenHome();
+                } else if (item.getItemId() == R.id.itemPersonal_Navigationbar) {
+                    Fragment_personal_screenHome fragmentPersonal = new Fragment_personal_screenHome();
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("customer", customer);
+                    fragmentPersonal.setArguments(bundle);
+                    fragment = fragmentPersonal;
                 }
-                else  if (item.getItemId() == R.id.itemMessage_Navigationbar){
-                    loadingFragment(new Fragment_message_screenHome());
-                    return true;
-                }
-                else if (item.getItemId() == R.id.itemPersonal_Navigationbar){
-                    loadingFragment(new Fragment_personal_screenHome());
+
+                if (fragment != null) {
+                    loadingFragment(fragment);
                     return true;
                 }
                 return false;
@@ -80,6 +86,7 @@ public class Home extends AppCompatActivity {
         fragmentTransaction.replace(framelayout_screenhome.getId(),fragmentLoading);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
+
     }
 
     private void getDataProduct(){
