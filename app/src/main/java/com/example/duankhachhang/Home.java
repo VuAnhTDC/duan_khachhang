@@ -41,7 +41,7 @@ public class Home extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         context = this;
-        customer = new Customer("0123456789", "demo address", "Demo", null);
+        //customer = new Customer("0123456789", "demo address", "Demo", null);
         setControl();
         setEvent();
         loadingFragment(new Fragment_home_screenHome());

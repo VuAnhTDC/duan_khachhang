@@ -96,7 +96,7 @@ public class Detailproduct extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailproduct);
         context = this;
-        customer = new Customer("0123456789", "demo address", "Demo", null);
+//        customer = new Customer("0123456789", "demo address", "Demo", null);
         setControl();
         setIniazation();
         getDataProduct();

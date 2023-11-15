@@ -76,7 +76,7 @@ public class Fragment_home_screenHome extends Fragment {
 //        customer = (Customer)intent.getSerializableExtra("informationCustomer");
 
 //        Cấp dữ liệu ảo
-        customer = new Customer("0123456789", "demo address", "Demo", null);
+      //  customer = new Customer("0123456789", "demo address", "Demo", null);
 //        gán giá trị cho biến context
         context = getContext();
 //        gọi hàm ánh xạ

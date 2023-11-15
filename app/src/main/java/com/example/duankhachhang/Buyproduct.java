@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -44,6 +45,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -85,14 +87,17 @@ public class Buyproduct extends AppCompatActivity {
         setSupportActionBar(toolBar_OrderProduct);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+//        SharedPreferences sharedPreferences = getSharedPreferences("InformationShop", Context.MODE_PRIVATE);
+//        String jsonShop = sharedPreferences.getString("informationShop", "");
+//        Gson gson = new Gson();
+//        shopData = gson.fromJson(jsonShop, ShopData.class);
+
         Intent intent = getIntent();
         this.arrOrderData = (ArrayList<OrderData>) intent.getSerializableExtra("arrOrder");
         orderProductAdapter = new OrderProduct_Adapter(arrOrderData, context);
         rcvOrderList_OrderProduct.setLayoutManager(new LinearLayoutManager(context));
         rcvOrderList_OrderProduct.setAdapter(orderProductAdapter);
 
-//        Customer demo
-        customer = new Customer("0123456789", "demo address", "Demo", null);
         tvNumberphone_OrderProduct.setText(customer.getName());
         tvNumberphone_OrderProduct.setText(customer.getId());
         tvAddressUser_OrderProduct.setText(customer.getAddress());

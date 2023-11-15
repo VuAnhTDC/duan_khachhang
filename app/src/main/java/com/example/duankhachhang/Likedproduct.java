@@ -63,8 +63,8 @@ public class Likedproduct extends AppCompatActivity {
                 if (snapshot.exists()){
                     for (DataSnapshot itemLike: snapshot.getChildren()){
                         LikeProductData likeProduct = itemLike.getValue(LikeProductData.class);
-                       list.add(likeProduct);
-                       likeProductAdapter.notifyDataSetChanged();
+                        list.add(likeProduct);
+                        likeProductAdapter.notifyDataSetChanged();
                     }
                 }else {
                     System.out.println("không tìm thấy " + idCustomer );

@@ -51,7 +51,7 @@ public class CartCustomer_Adapter extends RecyclerView.Adapter<CartCustomer_View
         this.arrCartData = arrCartData;
         this.context = context;
         this.cartDataSelectionItemCartCustomer = cartDataSelectionItemCartCustomer;
-        customer = new Customer("0123456789", "demo address", "Demo", null);
+//        customer = new Customer("0123456789", "demo address", "Demo", null);
     }
     @NonNull
     @Override

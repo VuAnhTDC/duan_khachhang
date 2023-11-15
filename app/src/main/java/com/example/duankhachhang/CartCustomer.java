@@ -218,7 +218,7 @@ public class CartCustomer extends AppCompatActivity {
         itemTouchHelper.attachToRecyclerView(rcvCartListCustomer_CartCustomer);
 
 //       gán giá trị biến customer
-        customer = new Customer("0123456789", "demo address", "Demo", null);
+//        customer = new Customer("0123456789", "demo address", "Demo", null);
 
 //        Kích hoạt toolbar
         setSupportActionBar(toolBar_CartCustomer);

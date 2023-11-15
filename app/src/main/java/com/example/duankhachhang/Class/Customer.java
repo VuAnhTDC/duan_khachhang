@@ -5,17 +5,27 @@ import java.io.Serializable;
 public class Customer implements Serializable {
     private String id;
     private String address;
+    public String fcmToken;
     private String name;
     private String imageUser;
 
-    @Override
-    public String toString() {
-        return "Customer{" +
-                "id='" + id + '\'' +
-                ", address='" + address + '\'' +
-                ", name='" + name + '\'' +
-                ", imageUser='" + imageUser + '\'' +
-                '}';
+    public Customer(String id, String address, String name, String imageUser,String fcmToken) {
+        this.id = id;
+        this.address = address;
+        this.name = name;
+        this.imageUser = imageUser;
+        this.fcmToken = fcmToken;
+    }
+
+    public Customer() {
+    }
+
+    public String getFcmToken() {
+        return fcmToken;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 
     public String getId() {
@@ -50,17 +60,14 @@ public class Customer implements Serializable {
         this.imageUser = imageUser;
     }
 
-    public Customer(String id, String address, String name, String imageUser) {
-        this.id = id;
-        this.address = address;
-        this.name = name;
-        this.imageUser = imageUser;
-    }
-
-    public Customer() {
-        this.id = null;
-        this.address = null;
-        this.name = null;
-        this.imageUser = null;
+    @Override
+    public String toString() {
+        return "Customer{" +
+                "id='" + id + '\'' +
+                ", address='" + address + '\'' +
+                ", fcmToken='" + fcmToken + '\'' +
+                ", name='" + name + '\'' +
+                ", imageUser='" + imageUser + '\'' +
+                '}';
     }
 }
