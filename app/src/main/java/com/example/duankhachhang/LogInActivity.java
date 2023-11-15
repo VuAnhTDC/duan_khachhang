@@ -63,15 +63,15 @@ public class LogInActivity extends AppCompatActivity {
         ShowMessage.context = this;
     }
 
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-//        if (isLogin()){
-//            startActivity(new Intent(this, Home.class));
-//        }else {
-//            startActivity(new Intent(this, LogInActivity.class));
-//        }
-//    }
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (isLogin()){
+            startActivity(new Intent(this, Home.class));
+        }else {
+            startActivity(new Intent(this, LogInActivity.class));
+        }
+    }
     private boolean isLogin(){
         SharedPreferences sharedPreferences = getSharedPreferences("UserLogin",Context.MODE_PRIVATE);
         boolean login = sharedPreferences.getBoolean("isLogin",false);
