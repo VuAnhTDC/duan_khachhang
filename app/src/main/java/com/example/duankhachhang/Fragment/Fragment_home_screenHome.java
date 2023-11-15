@@ -1,7 +1,11 @@
 package com.example.duankhachhang.Fragment;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -24,13 +28,17 @@ import com.example.duankhachhang.Class.Customer;
 import com.example.duankhachhang.Class.ProductData;
 import com.example.duankhachhang.R;
 import com.example.duankhachhang.RecyclerView.ProductListHome_Adapter;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Fragment_home_screenHome extends Fragment {
 //    Biến lưu giữ thông tin người dùng app
@@ -49,6 +57,7 @@ public class Fragment_home_screenHome extends Fragment {
     private int timeDeplay = 2000;
     private int countProductInCart = 0;
     private final Handler handler = new Handler();
+    public static final String CHANEL_ID = "notificationnormal";
     ProductBanerAdapter productBanerAdapter;
     ArrayList<ProductData> arrProduct = new ArrayList<>();
     ProductListHome_Adapter productListHomeAdapter;
@@ -83,7 +92,16 @@ public class Fragment_home_screenHome extends Fragment {
         setEvent();
 //        Gán giá trị cho biến số lượng hình ảnh ở banner
         locationUrlImageProduct_ItemViewPager = 0;
+        createChanelNotification();
         return view;
+    }
+    private void createChanelNotification(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel notificationChannel = new NotificationChannel(CHANEL_ID,"pushNotification", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationManager notificationManager = getContext().getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+
     }
 
 //    hàm lấy số lượng sản phẩm trong giỏ hàng --- người dùng
@@ -206,6 +224,7 @@ public class Fragment_home_screenHome extends Fragment {
                         ProductData productData = productItem.getValue(ProductData.class);
 //                        Thêm product vừa lấy được vào danh sách product
                         arrProduct.add(productData);
+                        Collections.reverse(arrProduct);
 //                        Cập nhật lại product vừa lấy vào RecyclerView
                         productListHomeAdapter.notifyDataSetChanged();
                     }

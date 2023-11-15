@@ -27,16 +27,23 @@ import android.widget.Toast;
 import com.example.duankhachhang.Class.Customer;
 import com.example.duankhachhang.Class.OrderData;
 import com.example.duankhachhang.Class.ProductData;
+import com.example.duankhachhang.Class.ShopData;
 import com.example.duankhachhang.Dialog.EditDeliveryAddressCustomerDialogFragment;
+import com.example.duankhachhang.Fragment.Fragment_home_screenHome;
+import com.example.duankhachhang.Model.NotificationType;
+import com.example.duankhachhang.Model.SendNotification;
 import com.example.duankhachhang.RecyclerView.OrderProduct_Adapter;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 
@@ -59,6 +66,7 @@ public class Buyproduct extends AppCompatActivity {
     private int sumPriceAllProductOrder = 0;
     private int sumPriceAll = 0;
     private boolean changeDeliveryAddress = false;
+    private String fcmToken = "";
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     DatabaseReference  databaseReference;
 
@@ -67,6 +75,7 @@ public class Buyproduct extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_buyproduct);
         context = this;
+        SendNotification.setContext(context);
         setControl();
         setIntiazation();
         setEvent();
@@ -204,6 +213,8 @@ public class Buyproduct extends AppCompatActivity {
                                     public void onSuccess(Void unused) {
                                         databaseReference = firebaseDatabase.getReference("CartCustomer/" + itemOrder.getIdCustomer_Order()+"/"+itemOrder.getIdProduct_Order());
                                         databaseReference.removeValue();
+                                        sendMessageToShop(itemOrder);
+
                                     }
                                 });
                                 Toast.makeText(context, "Đã mua hàng thành công",Toast.LENGTH_SHORT).show();
@@ -220,6 +231,43 @@ public class Buyproduct extends AppCompatActivity {
             });
 
         }
+        getAndSaveFCMToken();
+    }
+
+    private void sendMessageToShop(OrderData orderData){
+        databaseReference = firebaseDatabase.getReference("Shop/"+orderData.getIdShop_Order());
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    ShopData shopData = snapshot.getValue(ShopData.class);
+                    SendNotification.getSendNotificationOrderSuccessFull(shopData.getFcmToken(),"Đơn đặt hàng","Đơn hàng có mã: " + orderData.getIdOrder() +"\n sản phẩm: " +orderData.getIdProduct_Order(),Fragment_home_screenHome.CHANEL_ID);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void getAndSaveFCMToken() {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            fcmToken = task.getResult();
+                            SendNotification.getSendNotificationOrderSuccessFull(fcmToken,"Kết quả đơn đặt hàng","Đơn đặt hàng của bạn đã được chuyển sang người bán hàng", NotificationType.NotificationNormal());
+                            Intent intent = new Intent(context,Home.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            System.out.println("Không lấy và lưu được fcm token");
+                        }
+                    }
+                });
     }
 
     private void hideKeyboard() {

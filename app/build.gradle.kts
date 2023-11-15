@@ -54,4 +54,5 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging")
     implementation ("com.facebook.android:facebook-login:latest.release")
     implementation ("com.facebook.android:facebook-android-sdk:[8,9)")
+    implementation("com.android.volley:volley:1.2.1")
 }

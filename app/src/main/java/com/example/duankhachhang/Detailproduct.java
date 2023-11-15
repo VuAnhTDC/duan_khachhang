@@ -200,17 +200,15 @@ public class Detailproduct extends AppCompatActivity {
     }
 
     private void getImageProduct() {
-        databaseReference = firebaseDatabase.getReference("ImageProducts");
-        Query query = databaseReference.orderByChild("idProduct").equalTo(productData.getIdProduct());
-        query.addValueEventListener(new ValueEventListener() {
+        databaseReference = firebaseDatabase.getReference("ImageProducts/"+idProduct);
+        databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     for (DataSnapshot imageItem :
                             snapshot.getChildren()) {
-                        Image image = imageItem.getValue(Image.class);
-                        arrUrlImage.add(image.getUrlImage());
-                        productBanerAdapter.notifyDataSetChanged();
+                            arrUrlImage.add(imageItem.child("urlImage").getValue().toString());
+                            productBanerAdapter.notifyDataSetChanged();
                     }
                 }
             }
@@ -480,6 +478,14 @@ public class Detailproduct extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(context, DetailShop.class);
                 intent.putExtra("idShop", productData.getIdUserProduct());
+                startActivity(intent);
+            }
+        });
+        ivChatShop_DetailProduct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, MessageActivity.class);
+                intent.putExtra("idUser",productData.getIdUserProduct());
                 startActivity(intent);
             }
         });

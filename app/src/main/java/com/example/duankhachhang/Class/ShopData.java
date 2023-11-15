@@ -6,6 +6,31 @@ public class ShopData implements Serializable {
     private int status;
     private String idShop, shopPhoneNumber, password, shopOwner, shopName,
             shopAddress, shopEmail, taxCode, urlImgCCCDFront, urlImgCCCDBack, urlImgShopAvatar;
+    private String fcmToken;
+
+    public ShopData(int status, String idShop, String shopPhoneNumber, String password, String shopOwner, String shopName, String shopAddress, String shopEmail, String taxCode, String urlImgCCCDFront, String urlImgCCCDBack, String urlImgShopAvatar, String fcmToken) {
+        this.status = status;
+        this.idShop = idShop;
+        this.shopPhoneNumber = shopPhoneNumber;
+        this.password = password;
+        this.shopOwner = shopOwner;
+        this.shopName = shopName;
+        this.shopAddress = shopAddress;
+        this.shopEmail = shopEmail;
+        this.taxCode = taxCode;
+        this.urlImgCCCDFront = urlImgCCCDFront;
+        this.urlImgCCCDBack = urlImgCCCDBack;
+        this.urlImgShopAvatar = urlImgShopAvatar;
+        this.fcmToken = fcmToken;
+    }
+
+    public String getFcmToken() {
+        return fcmToken;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
 
 
     public ShopData(int status, String idShop, String shopPhoneNumber, String password, String shopOwner, String shopName, String shopAddress, String shopEmail, String taxCode, String urlImgCCCDFront, String urlImgCCCDBack, String urlImgShopAvatar) {
@@ -22,17 +47,30 @@ public class ShopData implements Serializable {
         this.urlImgCCCDBack = urlImgCCCDBack;
         this.urlImgShopAvatar = urlImgShopAvatar;
     }
-    public ShopData(String idShop, String shopPhoneNumber, String shopOwner, String shopName, String shopAddress, String shopEmail, String taxCode, String urlImgCCCDFront, String urlImgCCCDBack) {
+
+    public ShopData(int status, String idShop, String shopPhoneNumber, String password, String shopOwner, String shopName, String shopAddress, String shopEmail, String taxCode) {
+        this.status = status;
         this.idShop = idShop;
         this.shopPhoneNumber = shopPhoneNumber;
+        this.password = password;
         this.shopOwner = shopOwner;
         this.shopName = shopName;
         this.shopAddress = shopAddress;
         this.shopEmail = shopEmail;
         this.taxCode = taxCode;
-        this.urlImgCCCDFront = urlImgCCCDFront;
-        this.urlImgCCCDBack = urlImgCCCDBack;
     }
+
+    //    public ShopData(String idShop, String shopPhoneNumber, String shopOwner, String shopName, String shopAddress, String shopEmail, String taxCode, String urlImgCCCDFront, String urlImgCCCDBack) {
+//        this.idShop = idShop;
+//        this.shopPhoneNumber = shopPhoneNumber;
+//        this.shopOwner = shopOwner;
+//        this.shopName = shopName;
+//        this.shopAddress = shopAddress;
+//        this.shopEmail = shopEmail;
+//        this.taxCode = taxCode;
+//        this.urlImgCCCDFront = urlImgCCCDFront;
+//        this.urlImgCCCDBack = urlImgCCCDBack;
+//    }
     public int getStatus() {
         return status;
     }
@@ -143,6 +181,15 @@ public class ShopData implements Serializable {
         this.urlImgShopAvatar = null;
     }
 
+    public ShopData(String shopPhoneNumber, String password) {
+        this.shopPhoneNumber = shopPhoneNumber;
+        this.password = password;
+    }
+
+    public ShopData(String shopPhoneNumber) {
+        this.shopPhoneNumber = shopPhoneNumber;
+    }
+
     @Override
     public String toString() {
         return "ShopData{" +
@@ -160,4 +207,6 @@ public class ShopData implements Serializable {
                 ", urlImgShopAvatar='" + urlImgShopAvatar + '\'' +
                 '}';
     }
+
+
 }

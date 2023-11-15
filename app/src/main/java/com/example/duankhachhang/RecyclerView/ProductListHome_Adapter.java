@@ -82,18 +82,13 @@ public class ProductListHome_Adapter extends RecyclerView.Adapter<ProductListHom
 
     private void isLoadingImageProductItem(ProductData productDataItem, ProductListHome_ViewHolder holder) {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference databaseReference = firebaseDatabase.getReference("ImageProducts");
-        Query query = databaseReference.orderByChild("idProduct").equalTo(productDataItem.getIdProduct());
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference databaseReference = firebaseDatabase.getReference("ImageProducts/"+productDataItem.getIdProduct() +"/1");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    for (DataSnapshot imageItem :
-                            snapshot.getChildren()) {
-                        Image image = imageItem.getValue(Image.class);
-                        Picasso.get().load(image.getUrlImage()).placeholder(R.drawable.icondowload).into(holder.ivProductItem_RecyclerViewProductList);
-                        return;
-                    }
+                   String urlImageFirst = snapshot.child("urlImage").getValue().toString();
+                   Picasso.get().load(urlImageFirst).placeholder(R.drawable.icondowload).into(holder.ivProductItem_RecyclerViewProductList);
                 }
             }
 

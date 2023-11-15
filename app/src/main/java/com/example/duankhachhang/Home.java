@@ -41,8 +41,6 @@ public class Home extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         context = this;
-//        Intent intent = getIntent();
-//        customer = (Customer)intent.getSerializableExtra("informationCustomer");
         customer = new Customer("0123456789", "demo address", "Demo", null);
         setControl();
         setEvent();
