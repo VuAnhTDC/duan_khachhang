@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.duankhachhang.Class.Customer;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DataSnapshot;
@@ -19,6 +21,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 
 public class EnterInformationActivity extends AppCompatActivity {
@@ -26,8 +29,11 @@ public class EnterInformationActivity extends AppCompatActivity {
     TextInputLayout til_phone,til_name,til_address;
     TextInputEditText ted_phone,ted_name,ted_address;
     Button btn_confirm;
-    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+    FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+    DatabaseReference databaseReference = firebaseDatabase.getReference();
     boolean isLogin = false;
+    String fcmToken;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,26 +68,10 @@ public class EnterInformationActivity extends AppCompatActivity {
                                 databaseReference.child("Customer").child(phone).child("imageUser").setValue(avatar);
                                 databaseReference.child("Customer").child(phone).child("name").setValue(name.trim());
                                 databaseReference.child("Customer").child(phone).child("address").setValue(address.trim());
-                                //databaseReference.child("Customer").child(phone).child("isLogin").setValue(isLogin);
                                 Toast.makeText(EnterInformationActivity.this, "tạo tài khoản thành công", Toast.LENGTH_SHORT).show();
-                                Customer customer = new Customer(phone,address,name,avatar);
-                                SharedPreferences shePreferencesCustomer = getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
-                                SharedPreferences shePreferencesLogin = getSharedPreferences("UserLogin", Context.MODE_PRIVATE);
-                                SharedPreferences.Editor editCustomer = shePreferencesCustomer.edit();
-                                SharedPreferences.Editor editLogin = shePreferencesLogin.edit();
-                                Gson gson = new Gson();
-                                String json = gson.toJson(customer);
-                                System.out.println(json.toString());
-                                editCustomer.putString("informationUserCustomer", json);
-                                editCustomer.putString("numberphone", customer.getId());
-                                editCustomer.putString("name", customer.getName());
-                                editCustomer.putString("image", customer.getImageUser());
-                                editCustomer.putString("address", customer.getAddress());
-                                editCustomer.commit();
-                                editCustomer.apply();
-                                editLogin.putBoolean("isLogin", isLogin);
-                                editLogin.commit();
-                                editLogin.apply();
+                                getAndSaveFCMToken(phone);
+                                Customer customer = new Customer(phone,address,name,avatar,fcmToken);
+                                saveSharedPreferences(customer);
                                 Intent intent1 = new Intent(EnterInformationActivity.this, Home.class);
                                 startActivity(intent1);
                                 finish();
@@ -94,6 +84,51 @@ public class EnterInformationActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+    private void saveSharedPreferences(Customer customer){
+        SharedPreferences shePreferencesCustomer = getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
+        SharedPreferences shePreferencesLogin = getSharedPreferences("UserLogin", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editCustomer = shePreferencesCustomer.edit();
+        SharedPreferences.Editor editLogin = shePreferencesLogin.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(customer);
+        System.out.println(json.toString());
+        editCustomer.putString("informationUserCustomer", json);
+        editCustomer.putString("numberphone", customer.getId());
+        editCustomer.putString("name", customer.getName());
+        editCustomer.putString("image", customer.getImageUser());
+        editCustomer.putString("address", customer.getAddress());
+        editCustomer.commit();
+        editCustomer.apply();
+        editLogin.putBoolean("isLogin", isLogin);
+        editLogin.commit();
+        editLogin.apply();
+    }
+    private void getAndSaveFCMToken(String idCustomer) {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            fcmToken = task.getResult();
+                            // Lưu FCM Token vào SharedPreferences hoặc gửi lên máy chủ
+                            saveFCMTokenToSharedPreferences(fcmToken);
+                            //Update fcmToken vào tài khoản đã đăng nhập thành công
+                            databaseReference.child("Customer").child(idCustomer).child("fcmToken").setValue(fcmToken);
+
+                        } else {
+                            System.out.println("Không lấy và lưu được fcm token");
+                        }
+                    }
+                });
+    }
+    private void saveFCMTokenToSharedPreferences(String fcmToken) {
+        //Lưu FCM Token vào SharedPreferences
+        SharedPreferences preferences = getSharedPreferences("myFCMToken", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("fcmToken", fcmToken);
+        editor.commit();
+        editor.apply();
     }
 
     private void setControl() {

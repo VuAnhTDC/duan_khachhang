@@ -39,16 +39,16 @@ public class InformationSettings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_information_settings);
         context = this;
-        SharedPreferences sharedPreferences = context.getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
-        String jsonShop = sharedPreferences.getString("informationUserCustomer", "");
-        Gson gson = new Gson();
-        customer = gson.fromJson(jsonShop, Customer.class);
-        System.out.println("thông tin Customer từ SharedPreferences ở InformationSettings: " + customer.toString());
         setControl();
         setIntiazational();
         setEvent();
     }
     private void setIntiazational() {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
+        String jsonShop = sharedPreferences.getString("informationUserCustomer", "");
+        Gson gson = new Gson();
+        customer = gson.fromJson(jsonShop, Customer.class);
+        System.out.println("thông tin Customer từ SharedPreferences ở InformationSettings: " + customer.toString());
         ted_setting_name.setText(customer.getName());
         ted_setting_address.setText(customer.getAddress());
     }

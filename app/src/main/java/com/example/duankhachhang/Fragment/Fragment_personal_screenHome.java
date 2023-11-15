@@ -104,8 +104,20 @@ public class Fragment_personal_screenHome extends Fragment {
     }
 
     private void Logout(){
+        clearSharedPreferences();
+        Intent intent = new Intent(getActivity(), LogInActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        getActivity().finish();
+
+    }
+    private void clearSharedPreferences(){
         SharedPreferences sharedPreferences = getContext().getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.apply();
+        SharedPreferences preferences = getContext().getSharedPreferences("myFCMToken", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editorFCMToken = preferences.edit();
         editor.clear();
         editor.apply();
         SharedPreferences shePreferencesLogin = getContext().getSharedPreferences("UserLogin", Context.MODE_PRIVATE);
@@ -113,11 +125,6 @@ public class Fragment_personal_screenHome extends Fragment {
         editorLogin.putBoolean("isLogin",isLogin);
         editorLogin.commit();
         editorLogin.apply();
-        Intent intent = new Intent(getActivity(), LogInActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        getActivity().finish();
-
     }
 
     private void setControl() {

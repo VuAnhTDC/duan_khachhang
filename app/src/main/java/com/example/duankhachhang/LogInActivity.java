@@ -34,6 +34,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 
 import android.view.inputmethod.InputMethodManager;
@@ -198,24 +199,8 @@ public class LogInActivity extends AppCompatActivity {
                         if (snapshot.exists()){
                             isLogin = true;
                             Customer customer1 = snapshot.getValue(Customer.class);
-                            System.out.println("updateUI  customer: " + customer1.toString());
-                            SharedPreferences shePreferencesCustomer = getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
-                            SharedPreferences shePreferencesLogin = getSharedPreferences("UserLogin", Context.MODE_PRIVATE);
-                            SharedPreferences.Editor editCustomer = shePreferencesCustomer.edit();
-                            SharedPreferences.Editor editLogin = shePreferencesLogin.edit();
-                            Gson gson = new Gson();
-                            String json = gson.toJson(customer1);
-                            System.out.println(json.toString());
-                            editCustomer.putString("informationUserCustomer", json);
-                            editCustomer.putString("numberphone", customer1.getId());
-                            editCustomer.putString("name", customer1.getName());
-                            editCustomer.putString("image", customer1.getImageUser());
-                            editCustomer.putString("address", customer1.getAddress());
-                            editCustomer.commit();
-                            editCustomer.apply();
-                            editLogin.putBoolean("isLogin", isLogin);
-                            editLogin.commit();
-                            editLogin.apply();
+//                            System.out.println("updateUI  customer: " + customer1.toString());
+                            saveSharedPreferences(customer1);
                             Intent intent = new Intent(LogInActivity.this, Home.class);
                             intent.putExtra("customer",customer1);
                             startActivity(intent);
@@ -237,6 +222,31 @@ public class LogInActivity extends AppCompatActivity {
             }
         }
     }
+    private void saveSharedPreferences(Customer customer){
+        SharedPreferences shePreferencesCustomer = getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
+        SharedPreferences shePreferencesLogin = getSharedPreferences("UserLogin", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editCustomer = shePreferencesCustomer.edit();
+        SharedPreferences.Editor editLogin = shePreferencesLogin.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(customer);
+        System.out.println(json.toString());
+        editCustomer.putString("informationUserCustomer", json);
+        editCustomer.putString("numberphone", customer.getId());
+        editCustomer.putString("name", customer.getName());
+        editCustomer.putString("image", customer.getImageUser());
+        editCustomer.putString("address", customer.getAddress());
+        editCustomer.commit();
+        editCustomer.apply();
+        editLogin.putBoolean("isLogin", isLogin);
+        editLogin.commit();
+        editLogin.apply();
+        SharedPreferences preferences = getSharedPreferences("myFCMToken", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("fcmToken", customer.getFcmToken());
+        editCustomer.commit();
+        editor.apply();
+    }
+
 
     private void hideKeyboard() {
         View view = this.getCurrentFocus();
