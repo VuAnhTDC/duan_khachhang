@@ -57,7 +57,6 @@ public class Fragment_personal_screenHome extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.framelayout_itempersonal_activity_screenhome,container,false);
-        Customer customer1 = (Customer) getArguments().getSerializable("customer");
         SharedPreferences sharedPreferences1 = requireContext().getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
         String jsonShop = sharedPreferences1.getString("informationUserCustomer", "");
         Gson gson = new Gson();

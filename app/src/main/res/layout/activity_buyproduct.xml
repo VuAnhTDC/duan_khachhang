@@ -349,7 +349,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:background="@drawable/bg_button_payorder"
-                        android:text="Thanh toán"
+                        android:text="Đặt hàng"
                         android:textStyle="bold" />
                 </LinearLayout>
 

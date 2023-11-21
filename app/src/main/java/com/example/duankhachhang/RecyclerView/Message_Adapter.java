@@ -1,6 +1,7 @@
 package com.example.duankhachhang.RecyclerView;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,12 +12,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.duankhachhang.Class.Customer;
 import com.example.duankhachhang.Class.ItemMessage;
+import com.example.duankhachhang.Class.ShopData;
 import com.example.duankhachhang.R;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -26,10 +29,15 @@ public class Message_Adapter extends RecyclerView.Adapter<Message_ViewHolder> {
     private Context context;
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     DatabaseReference databaseReference;
+    private Customer customer = new Customer();
 
     public Message_Adapter(ArrayList<String> arrIdItemMessage, Context context) {
         this.arrIdItemMessage = arrIdItemMessage;
         this.context = context;
+        SharedPreferences sharedPreferences = context.getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
+        String jsonShop = sharedPreferences.getString("informationUserCustomer", "");
+        Gson gson = new Gson();
+        customer = gson.fromJson(jsonShop, Customer.class);
     }
 
     @NonNull
@@ -54,16 +62,16 @@ public class Message_Adapter extends RecyclerView.Adapter<Message_ViewHolder> {
                     String nameTable = itemMessage.getIdSender().toString().split("-")[1];
                     String idUser = itemMessage.getIdSender().toString().split("-")[0];
                     if (nameTable.equals("Shop")){
+                        setInformationShop(idUser,holder);
                         holder.tvContentItem_CustomerItemMessage.setText(itemMessage.getContentMessage());
-                        holder.vItemMessage.setGravity(Gravity.RIGHT);
-                        holder.ivAvataUser_CustomerItemMessage.setVisibility(View.GONE);
+                        holder.vItemMessage.setGravity(Gravity.LEFT);
+                        holder.ivAvataUser_CustomerItemMessage.setVisibility(View.VISIBLE);
                         holder.tvContentItem_CustomerItemMessage.setBackgroundResource(R.drawable.bg_tvcontent_user01);
                     } else if (nameTable.equals("Customer")) {
-                        setInformationCustomer(idUser, holder);
-                        holder.ivAvataUser_CustomerItemMessage.setVisibility(View.VISIBLE);
+                        holder.ivAvataUser_CustomerItemMessage.setVisibility(View.GONE);
                         holder.tvContentItem_CustomerItemMessage.setText(itemMessage.getContentMessage());
                         holder.tvContentItem_CustomerItemMessage.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
-                        holder.vItemMessage.setGravity(Gravity.LEFT);
+                        holder.vItemMessage.setGravity(Gravity.RIGHT);
                         holder.tvContentItem_CustomerItemMessage.setBackgroundResource(R.drawable.bg_tvcontent_user02);
                     }
                 }
@@ -76,17 +84,17 @@ public class Message_Adapter extends RecyclerView.Adapter<Message_ViewHolder> {
         });
     }
 
-    private void setInformationCustomer(String idCustomer, Message_ViewHolder holder) {
-        databaseReference = firebaseDatabase.getReference("Customer/" + idCustomer);
+    private void setInformationShop(String idShop, Message_ViewHolder holder) {
+        databaseReference = firebaseDatabase.getReference("Shop/" + idShop);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    Customer customer = snapshot.getValue(Customer.class);
-                    if (customer.getImageUser().isEmpty()) {
+                    ShopData shopData = snapshot.getValue(ShopData.class);
+                    if (shopData.getIdShop().isEmpty()) {
                         Picasso.get().load(R.drawable.icon_personal).into(holder.ivAvataUser_CustomerItemMessage);
                     } else {
-                        Picasso.get().load(customer.getImageUser()).into(holder.ivAvataUser_CustomerItemMessage);
+                        Picasso.get().load(shopData.getUrlImgShopAvatar()).into(holder.ivAvataUser_CustomerItemMessage);
                     }
                 }
             }

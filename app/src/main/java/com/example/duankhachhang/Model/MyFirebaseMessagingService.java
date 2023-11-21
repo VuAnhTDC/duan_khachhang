@@ -33,31 +33,36 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         System.out.println("tag:" + tag);
         sendNotification(title, strMessage, tag);
     }
-    private void createChanelNotification(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            NotificationChannel notificationChannel = new NotificationChannel(NotificationType.NotificationNormal(),"Thong bao", NotificationManager.IMPORTANCE_DEFAULT);
+
+    private void createChanelNotification() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(NotificationType.NotificationNormal(), "Thong bao", NotificationManager.IMPORTANCE_DEFAULT);
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(notificationChannel);
         }
     }
+
     private void sendNotification(String title, String strMessage, String notificationType) {
-        Intent intent;
-        intent = new Intent(this,Fragment_home_screenHome.class);
-        if (notificationType.equals(NotificationType.NotificationChat())){
-            intent = new Intent(this,Fragment_message_screenHome.class);
-        }
+        Intent intent = new Intent(this, Fragment_home_screenHome.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder notificationCompat;
-        notificationCompat =new NotificationCompat.Builder(this, notificationType)
-                .setContentTitle(title)
-                .setContentText(strMessage)
-                .setSmallIcon(R.drawable.icon_message)
-                .setContentIntent(pendingIntent);
-        if (notificationType.equals(NotificationType.NotificationNormal())){
-            notificationCompat =new NotificationCompat.Builder(this, notificationType)
+        if (notificationType.equals(NotificationType.NotificationNormal())) {
+            notificationCompat = new NotificationCompat.Builder(this, notificationType)
                     .setContentTitle(title)
                     .setContentText(strMessage)
                     .setSmallIcon(R.drawable.icon_product)
+                    .setContentIntent(pendingIntent);
+        } else if (notificationType.equals("chat")) {
+            notificationCompat = new NotificationCompat.Builder(this, NotificationType.NotificationNormal())
+                    .setContentTitle(title)
+                    .setContentText(strMessage)
+                    .setSmallIcon(R.drawable.icon_chat_notification)
+                    .setContentIntent(pendingIntent);
+        } else {
+            notificationCompat = new NotificationCompat.Builder(this, NotificationType.NotificationNormal())
+                    .setContentTitle(title)
+                    .setContentText(strMessage)
+                    .setSmallIcon(R.drawable.ic_launcher_background)
                     .setContentIntent(pendingIntent);
         }
         Notification notification = notificationCompat.build();

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,6 +34,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -65,6 +67,10 @@ public class CartCustomer extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart_customer);
         context = this;
+        SharedPreferences sharedPreferences = context.getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
+        String jsonShop = sharedPreferences.getString("informationUserCustomer", "");
+        Gson gson = new Gson();
+        customer = gson.fromJson(jsonShop, Customer.class);
         setControl();
         setIntiazational();
         getInformationCart_IdCustomer();
@@ -97,7 +103,7 @@ public class CartCustomer extends AppCompatActivity {
 
     // hàm lấy thông tin sản phẩm vừa chọn
     private void getInformationProductSelection(int position) {
-        databaseReference = firebaseDatabase.getReference("Product/" + arrCart.get(position).getIdProduct());
+        databaseReference = firebaseDatabase.getReference("Product/" + arrCart.get(position).getIdShop()+"/"+arrCart.get(position).getIdProduct());
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -216,11 +222,6 @@ public class CartCustomer extends AppCompatActivity {
             }
         });
         itemTouchHelper.attachToRecyclerView(rcvCartListCustomer_CartCustomer);
-
-//       gán giá trị biến customer
-//        customer = new Customer("0123456789", "demo address", "Demo", null);
-
-//        Kích hoạt toolbar
         setSupportActionBar(toolBar_CartCustomer);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }

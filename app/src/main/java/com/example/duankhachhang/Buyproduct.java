@@ -47,7 +47,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class Buyproduct extends AppCompatActivity {
 
@@ -86,12 +88,10 @@ public class Buyproduct extends AppCompatActivity {
     private void setIntiazation() {
         setSupportActionBar(toolBar_OrderProduct);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-//        SharedPreferences sharedPreferences = getSharedPreferences("InformationShop", Context.MODE_PRIVATE);
-//        String jsonShop = sharedPreferences.getString("informationShop", "");
-//        Gson gson = new Gson();
-//        shopData = gson.fromJson(jsonShop, ShopData.class);
-
+        SharedPreferences sharedPreferences = context.getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
+        String jsonShop = sharedPreferences.getString("informationUserCustomer", "");
+        Gson gson = new Gson();
+        customer = gson.fromJson(jsonShop, Customer.class);
         Intent intent = getIntent();
         this.arrOrderData = (ArrayList<OrderData>) intent.getSerializableExtra("arrOrder");
         orderProductAdapter = new OrderProduct_Adapter(arrOrderData, context);
@@ -104,9 +104,11 @@ public class Buyproduct extends AppCompatActivity {
         for (OrderData orderData : arrOrderData) {
             sumPriceAllProductOrder += orderData.getPrice_Order();
         }
-        tvSumPriceProduct_OrderProduct.setText(sumPriceAllProductOrder + " Vnd");
+        Locale locale = new Locale("vi","VN");
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+        tvSumPriceProduct_OrderProduct.setText(numberFormat.format(sumPriceAllProductOrder) +"VND");
         sumPriceAll = sumPriceAllProductOrder + 25000 + 0;
-        tvSumMoney_OrderProduct.setText(sumPriceAll + "VND");
+        tvSumMoney_OrderProduct.setText(numberFormat.format(sumPriceAll) + "VND");
 
     }
 
@@ -173,9 +175,6 @@ public class Buyproduct extends AppCompatActivity {
                 editDeliveryAddressCustomerDialogFragment.show(getSupportFragmentManager(),"Sửa địa chỉ nhận hàng");
             }
         });
-
-
-
     }
 
     private void pushDataOrderToFirebase(){
@@ -184,7 +183,7 @@ public class Buyproduct extends AppCompatActivity {
             if (changeDeliveryAddress){
                 itemOrder.setDeliveryAddress(tvAddressUser_OrderProduct.getText().toString());
             }
-            databaseReference = firebaseDatabase.getReference("Product/"+itemOrder.getIdProduct_Order());
+            databaseReference = firebaseDatabase.getReference("Product/"+itemOrder.getIdShop_Order() +"/"+itemOrder.getIdProduct_Order());
             databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -196,8 +195,8 @@ public class Buyproduct extends AppCompatActivity {
                             public void onSuccess(Void unused) {
                                 databaseReference = firebaseDatabase.getReference("OrderProduct");
                                 String keyPush = databaseReference.push().toString().substring(databaseReference.push().toString().lastIndexOf("/"));
-                                itemOrder.setIdOrder(keyPush.substring(0));
-                                databaseReference.child(itemOrder.getIdShop_Order() + keyPush).setValue(itemOrder).addOnFailureListener(new OnFailureListener() {
+                                itemOrder.setIdOrder(keyPush.substring(1));
+                                databaseReference.child(itemOrder.getIdOrder()).setValue(itemOrder).addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
                                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -219,6 +218,8 @@ public class Buyproduct extends AppCompatActivity {
                                         databaseReference = firebaseDatabase.getReference("CartCustomer/" + itemOrder.getIdCustomer_Order()+"/"+itemOrder.getIdProduct_Order());
                                         databaseReference.removeValue();
                                         sendMessageToShop(itemOrder);
+                                        addOrderCustomer(itemOrder);
+                                        addOrderToShop(itemOrder);
 
                                     }
                                 });
@@ -239,6 +240,17 @@ public class Buyproduct extends AppCompatActivity {
         getAndSaveFCMToken();
     }
 
+//    thêm order cho của hàng
+    private void addOrderToShop(OrderData orderData){
+        databaseReference = firebaseDatabase.getReference("OrderShop");
+        databaseReference.child(orderData.getIdShop_Order()).child(orderData.getIdOrder()).child("idItemOrder").setValue(orderData.getIdOrder());
+    }
+
+    private void addOrderCustomer(OrderData orderData){
+        databaseReference = firebaseDatabase.getReference("OrderCustomer");
+        databaseReference.child(orderData.getIdCustomer_Order()).child(orderData.getIdOrder()).child("idItemOrder").setValue(orderData.getIdOrder());
+    }
+
     private void sendMessageToShop(OrderData orderData){
         databaseReference = firebaseDatabase.getReference("Shop/"+orderData.getIdShop_Order());
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -246,7 +258,7 @@ public class Buyproduct extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()){
                     ShopData shopData = snapshot.getValue(ShopData.class);
-                    SendNotification.getSendNotificationOrderSuccessFull(shopData.getFcmToken(),"Đơn đặt hàng","Đơn hàng có mã: " + orderData.getIdOrder() +"\n sản phẩm: " +orderData.getIdProduct_Order(),Fragment_home_screenHome.CHANEL_ID);
+                    SendNotification.getSendNotificationOrderSuccessFull(shopData.getFcmToken(),"Đơn đặt hàng","Đơn hàng có mã: " + orderData.getIdOrder() +"\n sản phẩm: " +orderData.getIdProduct_Order(),NotificationType.NotificationNormal());
                 }
             }
 
@@ -264,7 +276,7 @@ public class Buyproduct extends AppCompatActivity {
                     public void onComplete(@NonNull Task<String> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             fcmToken = task.getResult();
-                            SendNotification.getSendNotificationOrderSuccessFull(fcmToken,"Kết quả đơn đặt hàng","Đơn đặt hàng của bạn đã được chuyển sang người bán hàng", NotificationType.NotificationNormal());
+                            SendNotification.getSendNotificationOrderSuccessFull(fcmToken,"Kết quả đơn đặt hàng","Đơn đặt hàng của bạn đã được chuyển sang người bán hàng", NotificationType.NotificationOrder());
                             Intent intent = new Intent(context,Home.class);
                             startActivity(intent);
                             finish();

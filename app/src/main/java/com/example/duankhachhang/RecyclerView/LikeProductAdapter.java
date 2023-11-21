@@ -104,17 +104,13 @@ public class LikeProductAdapter extends RecyclerView.Adapter<LikeProductViewHold
     }
 
     private void setImageProduct(String idProduct, LikeProductViewHolder holder){
-        databaseReference = firebaseDatabase.getReference("ImageProducts");
-        Query query = databaseReference.orderByChild("idProduct").equalTo(idProduct);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference = firebaseDatabase.getReference("ImageProducts/" +idProduct+"/1");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
-                    for (DataSnapshot itemImage: snapshot.getChildren()) {
-                        Image image = itemImage.getValue(Image.class);
-                        Picasso.get().load(image.getUrlImage()).placeholder(R.drawable.icondowload).into(holder.img_product);
-                        return;
-                    }
+                    String urlImageFirst = snapshot.child("urlImage").getValue().toString();
+                    Picasso.get().load(urlImageFirst).placeholder(R.drawable.icondowload).into(holder.img_product);
                 }
             }
             @Override

@@ -2,91 +2,135 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:gravity="center"
     android:layout_marginTop="5dp"
     android:layout_marginHorizontal="5dp"
     android:padding="5dp"
-    android:id="@+id/linearLayout_ItemOrderList">
+    android:id="@+id/linearLayout_ItemOrderList"
+    android:background="@drawable/bg_container_imageproduct"
+    >
 
     <FrameLayout
-        android:layout_width="100dp"
+        android:layout_width="match_parent"
         android:layout_height="100dp">
-        <ImageView
-            android:layout_marginRight="10dp"
-            android:id="@+id/imgItemOrder_Product"
+        <LinearLayout
+            android:id="@+id/vInformationOrder_ItemOrderList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:layout_marginLeft="5dp"
-            android:src="@drawable/icondowload"/>
-        <ProgressBar
-            android:id="@+id/progessBar_loadingImageItem_OrderDetail"
+            android:orientation="horizontal"
+
+            >
+            <FrameLayout
+                android:layout_width="100dp"
+                android:layout_height="100dp">
+                <ImageView
+                    android:layout_marginRight="10dp"
+                    android:id="@+id/imgItemOrder_Product"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:layout_marginLeft="5dp"
+                    android:src="@drawable/icondowload"/>
+                <ProgressBar
+                    android:id="@+id/progessBar_loadingImageItem_OrderDetail"
+                    android:visibility="gone"
+                    android:indeterminate="true"
+                    style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Small"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tên khách hàng"
+                    android:id="@+id/tvNameCustomer"
+                    android:textColor="#000"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/tvNameProduct_OrderDetail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tên sản phẩm"
+                    android:textColor="#000" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Giá: "
+                        android:textColor="#000" />
+                    <TextView
+                        android:id="@+id/tvPrice"
+                        android:layout_width="180dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="#000" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="x"
+                        android:textColor="#000"/>
+                    <TextView
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/tvAmountProduct_OrderDetail"
+                        android:textColor="#000"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Thành tiền: "
+                        android:textColor="#000"/>
+                    <TextView
+                        android:id="@+id/tvTotal_OrderDetail"
+                        android:layout_width="140dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="#000" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+<!--        view hủy đơn hàng-->
+        <LinearLayout
+            android:id="@+id/vCancellItemOrder_ItemOrderList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
             android:visibility="gone"
-            android:indeterminate="true"
-            style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Small"
+            >
+            <ImageView
+                android:id="@+id/ivIconCancelOrder_ItemOrderList"
+                android:layout_width="60dp"
+                android:layout_height="60dp"/>
+        </LinearLayout>
+<!--        view comment đơn hàng-->
+        <LinearLayout
+            android:id="@+id/vCommnetOrder_ItemOrderList"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="#FFFFFF"
+            android:visibility="gone"
+            >
+            <ImageView
+                android:id="@+id/ivIconCommentOrder_ItemOrderList"
+                android:layout_width="60dp"
+                android:layout_height="60dp"/>
+        </LinearLayout>
     </FrameLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tên khách hàng"
-            android:id="@+id/tvNameCustomer"
-            android:textColor="#000"
-            android:textStyle="bold"/>
-
-        <TextView
-            android:id="@+id/tvNameProduct_OrderDetail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tên sản phẩm"
-            android:textColor="#000" />
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Giá: "
-                android:textColor="#000" />
-            <TextView
-                android:id="@+id/tvPrice"
-                android:layout_width="180dp"
-                android:layout_height="wrap_content"
-                android:textColor="#000" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="x"
-                android:textColor="#000"/>
-            <TextView
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/tvAmountProduct_OrderDetail"
-                android:textColor="#000"/>
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Thành tiền: "
-                android:textColor="#000"/>
-            <TextView
-                android:id="@+id/tvTotal_OrderDetail"
-                android:layout_width="140dp"
-                android:layout_height="wrap_content"
-                android:textColor="#000" />
-        </LinearLayout>
-    </LinearLayout>
 </LinearLayout>

@@ -19,6 +19,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.duankhachhang.Class.Customer;
 import com.example.duankhachhang.Class.ItemMessage;
 import com.example.duankhachhang.Class.ShopData;
+import com.example.duankhachhang.Model.NotificationType;
+import com.example.duankhachhang.Model.SendNotification;
 import com.example.duankhachhang.RecyclerView.Message_Adapter;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -50,6 +52,7 @@ public class MessageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
         context = this;
+        SendNotification.setContext(context);
         setControl();
         setIntiazation();
         getMessageUser();
@@ -63,16 +66,37 @@ public class MessageActivity extends AppCompatActivity {
         databaseReference.child(keyPush).setValue(itemMessage).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void unused) {
+                String content = edtInputContent_Message.getText().toString();
                 clearInput();
                 hideKeyboard();
                 databaseReference = firebaseDatabase.getReference("Message/"+customer.getId()+"/"+idUser);
                 databaseReference.child(itemMessage.getIdItemMessage()+"/idItemMessage").setValue(itemMessage.getIdItemMessage());
                 databaseReference = firebaseDatabase.getReference("Message/"+idUser+"/"+customer.getId());
                 databaseReference.child(itemMessage.getIdItemMessage()+"/idItemMessage").setValue(itemMessage.getIdItemMessage());
+                sendMessageToShopFcmToken(content);
             }
         });
 
     }
+
+    private void sendMessageToShopFcmToken(String content){
+        databaseReference = firebaseDatabase.getReference("Shop/" + idUser);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    ShopData shopData = snapshot.getValue(ShopData.class);
+                    SendNotification.getSendNotificationOrderSuccessFull(shopData.getFcmToken(),"Khách hàng: "+customer.getName(),content, NotificationType.NotificationChat());
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
 
     private void getMessageUser() {
         databaseReference = firebaseDatabase.getReference("Message/" + customer.getId()+"/"+idUser);
@@ -125,10 +149,10 @@ public class MessageActivity extends AppCompatActivity {
     private void setIntiazation() {
         Intent intent = getIntent();
         idUser = intent.getStringExtra("idUser");
-//        SharedPreferences sharedPreferences = getSharedPreferences("InformationShop", Context.MODE_PRIVATE);
-//        String jsonShop = sharedPreferences.getString("informationShop", "");
-//        Gson gson = new Gson();
-//        shopData = gson.fromJson(jsonShop, ShopData.class);
+        SharedPreferences sharedPreferences = context.getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
+        String jsonShop = sharedPreferences.getString("informationUserCustomer", "");
+        Gson gson = new Gson();
+        customer = gson.fromJson(jsonShop, Customer.class);
 
 //        gán giá trị cho adapter RecyclerView message
         messageAdapter = new Message_Adapter(arrIdItemMessage, context);

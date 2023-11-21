@@ -1,6 +1,9 @@
 package com.example.duankhachhang.RecyclerView;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.AnimatedImageDrawable;
 import android.graphics.drawable.Drawable;
@@ -27,6 +30,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -44,6 +48,7 @@ public class CartCustomer_Adapter extends RecyclerView.Adapter<CartCustomer_View
     private ArrayList<CartData> arrCartData = new ArrayList<>();
     private Context context ;
     private Customer customer = new Customer();
+    private  int quanlity = 0;
 
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     DatabaseReference databaseReference;
@@ -51,7 +56,10 @@ public class CartCustomer_Adapter extends RecyclerView.Adapter<CartCustomer_View
         this.arrCartData = arrCartData;
         this.context = context;
         this.cartDataSelectionItemCartCustomer = cartDataSelectionItemCartCustomer;
-//        customer = new Customer("0123456789", "demo address", "Demo", null);
+        SharedPreferences sharedPreferences = context.getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
+        String jsonShop = sharedPreferences.getString("informationUserCustomer", "");
+        Gson gson = new Gson();
+        customer = gson.fromJson(jsonShop, Customer.class);
     }
     @NonNull
     @Override
@@ -63,17 +71,15 @@ public class CartCustomer_Adapter extends RecyclerView.Adapter<CartCustomer_View
     public void onBindViewHolder(@NonNull CartCustomer_ViewHolder holder, int position) {
         CartData cartData = arrCartData.get(position);
         holder.tvQuanlityProduct.setText(cartData.getQuanlityProduct_Cart() + "");
-        setInformationProductItemCart(cartData.getIdProduct(),holder);
+        setInformationProductItemCart(cartData,holder);
 //        Tăng số lượng sản phẩm trong giỏ hàng
         holder.ivAddQuanlity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int quanlity = cartData.getQuanlityProduct_Cart();
+                 quanlity = cartData.getQuanlityProduct_Cart();
                 if(quanlity >= 1 && quanlity <=99){
-                    quanlity ++;
-                    cartData.setQuanlityProduct_Cart(quanlity);
-                    setItemCart(cartData);
-                    holder.cbxSelectionItem.setChecked(false);
+                    quanlity++;
+                    checkQuanlityProduct(cartData,holder);
                 }
             }
         });
@@ -82,7 +88,7 @@ public class CartCustomer_Adapter extends RecyclerView.Adapter<CartCustomer_View
         holder.ivSubtractionQuanlity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int quanlity = cartData.getQuanlityProduct_Cart();
+                 quanlity = cartData.getQuanlityProduct_Cart();
                 if(quanlity  >1){
                     quanlity --;
                     cartData.setQuanlityProduct_Cart(quanlity);
@@ -106,6 +112,42 @@ public class CartCustomer_Adapter extends RecyclerView.Adapter<CartCustomer_View
 
     }
 
+    private void checkQuanlityProduct(CartData cartData,CartCustomer_ViewHolder holder){
+        databaseReference = firebaseDatabase.getReference("Product/"+cartData.getIdShop()+"/"+cartData.getIdProduct());
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    ProductData productData = snapshot.getValue(ProductData.class);
+                    if (productData.getQuanlityProduct() < quanlity){
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        builder.setTitle("Thông báo");
+                        builder.setMessage("Sản phẩm hiển chỉ còn: " + productData.getQuanlityProduct() +" .Thật lòng xin lỗi vì đã không áp ứng đủ số lượng bạn cần");
+                        builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        });
+                        AlertDialog alertDialog = builder.create();
+                        alertDialog.show();
+
+                    }
+                    else {
+                        cartData.setQuanlityProduct_Cart(quanlity);
+                        setItemCart(cartData);
+                        holder.cbxSelectionItem.setChecked(false);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
 //     lưu thông tin thay đổi giỏ hàng của khách hàng
     private void setItemCart(CartData cartData){
         databaseReference = firebaseDatabase.getReference("CartCustomer/" +customer.getId()+"/"+cartData.getIdProduct());
@@ -113,8 +155,8 @@ public class CartCustomer_Adapter extends RecyclerView.Adapter<CartCustomer_View
     }
 
 //    lấy thông tin sản phẩm
-    private void setInformationProductItemCart(String idProduct, CartCustomer_ViewHolder holder){
-        databaseReference = firebaseDatabase.getReference("Product/"+idProduct);
+    private void setInformationProductItemCart(CartData cartData, CartCustomer_ViewHolder holder){
+        databaseReference = firebaseDatabase.getReference("Product/"+cartData.getIdShop()+"/"+cartData.getIdProduct());
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

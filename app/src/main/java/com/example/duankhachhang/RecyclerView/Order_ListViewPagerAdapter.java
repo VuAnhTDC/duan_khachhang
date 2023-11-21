@@ -1,11 +1,11 @@
 package com.example.duankhachhang.RecyclerView;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.example.duankhachhang.Fragment.FragmentOrderCancelled;
 import com.example.duankhachhang.Fragment.FragmentOrderDelivered;
@@ -18,7 +18,6 @@ public class Order_ListViewPagerAdapter extends FragmentStatePagerAdapter {
     public Order_ListViewPagerAdapter(@NonNull FragmentManager fm, int behavior) {
         super(fm, behavior);
     }
-
     @NonNull
     @Override
     public Fragment getItem(int position) {

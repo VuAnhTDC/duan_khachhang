@@ -128,18 +128,13 @@ public class OrderProduct_Adapter extends RecyclerView.Adapter<OrderProduct_View
     }
     private void setImageProductItem(OrderData orderData, OrderProduct_ViewHolder holder){
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference databaseReference = firebaseDatabase.getReference("ImageProducts");
-        Query query = databaseReference.orderByChild("idProduct").equalTo(orderData.getIdProduct_Order());
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference databaseReference = firebaseDatabase.getReference("ImageProducts/"+orderData.getIdProduct_Order()+"/1");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()){
-                    for (DataSnapshot imageItem:
-                            snapshot.getChildren()) {
-                        Image image = imageItem.getValue(Image.class);
-                        Picasso.get().load(image.getUrlImage()).into(holder.ivProduct_ItemOrderProduct);
-                        return;
-                    }
+                    String urlImageFirst = snapshot.child("urlImage").getValue().toString();
+                    Picasso.get().load(urlImageFirst).placeholder(R.drawable.icondowload).into(holder.ivProduct_ItemOrderProduct);
                 }
             }
 
@@ -152,7 +147,7 @@ public class OrderProduct_Adapter extends RecyclerView.Adapter<OrderProduct_View
     }
 
     private void setInformationProduct(OrderData orderData, OrderProduct_ViewHolder holder){
-        databaseReference = firebaseDatabase.getReference("Product/" + orderData.getIdProduct_Order());
+        databaseReference = firebaseDatabase.getReference("Product/" + orderData.getIdShop_Order() + "/"+orderData.getIdProduct_Order());
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

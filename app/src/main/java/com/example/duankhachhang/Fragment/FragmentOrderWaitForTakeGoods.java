@@ -22,10 +22,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class FragmentOrderWaitForTakeGoods extends Fragment {
     ArrayList<OrderData> arrayOrderData = new ArrayList<>();
@@ -45,9 +47,9 @@ public class FragmentOrderWaitForTakeGoods extends Fragment {
         Gson gson = new Gson();
         customerData = gson.fromJson(jsonShop, Customer.class);
         System.out.println("thông tin Customer từ SharedPreferences ở FragmentOrderDelivering: " + customerData.toString());
-        loadOrderItem();
         setControl(view);
         setInitiazation();
+        loadOrderItem();
         setEvent();
         // Inflate the layout for this fragment
         return view;
@@ -70,36 +72,38 @@ public class FragmentOrderWaitForTakeGoods extends Fragment {
     }
 
     private void loadOrderItem(){
-        //String fullPath = "OrderProduct/";
-        databaseReference = firebaseDatabase.getReference("OrderProduct");
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        databaseReference = firebaseDatabase.getReference("OrderCustomer/"+customerData.getId());
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                arrayOrderData.clear();
-                if (snapshot.exists()) {
-                    for (DataSnapshot shopItem : snapshot.getChildren()) {
-                        if (shopItem.exists()){
-                            for (DataSnapshot oderItem : shopItem.getChildren()){
-                                OrderData orderData = oderItem.getValue(OrderData.class);
-                                if (orderData.getStatusOrder() == 4) {
-                                    if (orderData.getIdCustomer_Order().equals(customerData.getId())){
+                if(snapshot.exists()){
+                    for (DataSnapshot itemIdOrder:
+                            snapshot.getChildren()) {
+                        String idOrderItem = itemIdOrder.getKey();
+                        DatabaseReference databaseReference1 = firebaseDatabase.getReference("OrderProduct/"+idOrderItem);
+                        databaseReference1.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if(snapshot.exists()){
+                                    OrderData orderData = snapshot.getValue(OrderData.class);
+                                    if (orderData.getStatusOrder() == 1){
                                         arrayOrderData.add(orderData);
-                                        System.out.println("order item: " + orderData.toString());
                                     }
+                                    else {
+                                        arrayOrderData.removeIf(element->element.getIdOrder().equals(orderData.getIdOrder()));
+                                    }
+                                    Collections.reverse(arrayOrderData);
+                                    orderAdaper.notifyDataSetChanged();
                                 }
                             }
-                        }
 
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
                     }
                 }
-                if (arrayOrderData.size() <= 0) {
-                    tvNoOrderWaitTakeGoods.setVisibility(View.VISIBLE);
-                    rcvOrderWaitTakeGoods.setVisibility(View.GONE);
-                } else {
-                    tvNoOrderWaitTakeGoods.setVisibility(View.GONE);
-                    rcvOrderWaitTakeGoods.setVisibility(View.VISIBLE);
-                }
-                orderAdaper.notifyDataSetChanged();
             }
 
             @Override

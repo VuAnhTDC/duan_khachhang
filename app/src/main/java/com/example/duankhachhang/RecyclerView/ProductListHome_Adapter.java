@@ -37,6 +37,7 @@ public class ProductListHome_Adapter extends RecyclerView.Adapter<ProductListHom
         this.context = context;
     }
 
+
     @NonNull
     @Override
     public ProductListHome_ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -73,7 +74,7 @@ public class ProductListHome_Adapter extends RecyclerView.Adapter<ProductListHom
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, Detailproduct.class);
-                intent.putExtra("idProduct", productData.getIdProduct());
+                intent.putExtra("Product", productData);
                 context.startActivity(intent);
             }
         });

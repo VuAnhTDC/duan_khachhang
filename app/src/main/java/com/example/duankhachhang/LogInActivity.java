@@ -3,9 +3,12 @@ package com.example.duankhachhang;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -32,7 +35,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
@@ -62,16 +64,34 @@ public class LogInActivity extends AppCompatActivity {
         setEvent();
         context = this;
         ShowMessage.context = this;
+        createChanelNotification();
+        getAndSaveFCMToken();
+    }
+    private void createChanelNotification(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel notificationChannel = new NotificationChannel("thongbao","Thong bao", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+    }
+    private void getAndSaveFCMToken() {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            String fcmToken = task.getResult();
+                            System.out.println("fcmtoken: " + fcmToken);
+                        } else {
+                            System.out.println("Không lấy và lưu được fcm token");
+                        }
+                    }
+                });
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        if (isLogin()){
-            startActivity(new Intent(this, Home.class));
-        }else {
-            startActivity(new Intent(this, LogInActivity.class));
-        }
     }
     private boolean isLogin(){
         SharedPreferences sharedPreferences = getSharedPreferences("UserLogin",Context.MODE_PRIVATE);

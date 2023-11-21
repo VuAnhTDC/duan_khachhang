@@ -1,6 +1,8 @@
 package com.example.duankhachhang.RecyclerView;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +17,7 @@ import com.example.duankhachhang.Class.FormatMoneyVietNam;
 import com.example.duankhachhang.Class.Image;
 import com.example.duankhachhang.Class.OrderData;
 import com.example.duankhachhang.Class.ProductData;
+import com.example.duankhachhang.Class.ShopData;
 import com.example.duankhachhang.Detailproduct;
 import com.example.duankhachhang.R;
 import com.google.firebase.database.DataSnapshot;
@@ -51,17 +54,41 @@ public class OrderItem_Adaper extends RecyclerView.Adapter<OrderItem_ViewHolder>
             OrderData orderData = arrayOrderData.get(position);
             holder.tvAmountProduct.setText(orderData.getQuanlity_Order()+"");
             holder.tvTotal.setText(FormatMoneyVietNam.formatMoneyVietNam(orderData.getPrice_Order())+"đ");
-            getInforCustomer(orderData.getIdCustomer_Order(),holder);
-            getInforProduct(orderData.getIdProduct_Order(),holder);
+            getInformationShop(orderData.getIdShop_Order(),holder);
+            getInforProduct(orderData,holder);
             getImageProduct(orderData.getIdProduct_Order(),holder);
             final int finalPosition = position;
-            holder.linearLayout_ItemOrderList.setOnClickListener(new View.OnClickListener() {
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intent = new Intent(context, Detailproduct.class);
-                    OrderData orderData1 = arrayOrderData.get(finalPosition);
-                    intent.putExtra("idProduct", orderData1.getIdProduct_Order());
-                    context.startActivity(intent);
+                    databaseReference = firebaseDatabase.getReference("Product/"+orderData.getIdShop_Order()+"/"+orderData.getIdProduct_Order());
+                    databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()){
+                                ProductData productData = snapshot.getValue(ProductData.class);
+                                Intent intent = new Intent(context, Detailproduct.class);
+                                intent.putExtra("Product", productData);
+                                context.startActivity(intent);
+                            }
+                            else {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                builder.setTitle("Thông báo");
+                                builder.setMessage("Sản phẩm không tồn tại. (Có thể là do cửa hàng đã xóa trên sàn giao dịch hoặc đã bị cấm bán)");
+                                builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
                 }
             });
         }
@@ -69,14 +96,15 @@ public class OrderItem_Adaper extends RecyclerView.Adapter<OrderItem_ViewHolder>
 
 
 
-    private void getInforCustomer(String idCustomer, OrderItem_ViewHolder holder){
-        databaseReference = firebaseDatabase.getReference("Customer/"+idCustomer);
+
+    private void getInformationShop(String idShop, OrderItem_ViewHolder holder){
+        databaseReference = firebaseDatabase.getReference("Shop/"+idShop);
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
-                    Customer customer1 = snapshot.getValue(Customer.class);
-                    holder.tvNameCustomer.setText(customer1.getName());
+                    ShopData shopData = snapshot.getValue(ShopData.class);
+                    holder.tvNameCustomer.setText("Shop: " + shopData.getShopName());
                 }
             }
             @Override
@@ -86,17 +114,13 @@ public class OrderItem_Adaper extends RecyclerView.Adapter<OrderItem_ViewHolder>
         });
     }
     private void getImageProduct(String idProduct,OrderItem_ViewHolder holder){
-        databaseReference = firebaseDatabase.getReference("ImageProducts");
-        Query query = databaseReference.orderByChild("idProduct").equalTo(idProduct);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference = firebaseDatabase.getReference("ImageProducts/"+idProduct+"/1");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
-                    for (DataSnapshot imageItem : snapshot.getChildren()){
-                        Image image = imageItem.getValue(Image.class);
-                        Picasso.get().load(image.getUrlImage()).placeholder(R.drawable.icondowload).into(holder.imgItemOrder_Product);
-                        return;
-                    }
+                    String urlImageFirst = snapshot.child("urlImage").getValue().toString();
+                    Picasso.get().load(urlImageFirst).placeholder(R.drawable.icondowload).into(holder.imgItemOrder_Product);
                 }
             }
             @Override
@@ -105,8 +129,8 @@ public class OrderItem_Adaper extends RecyclerView.Adapter<OrderItem_ViewHolder>
             }
         });
     }
-    private void getInforProduct(String idProduct, OrderItem_ViewHolder holder){
-        databaseReference = firebaseDatabase.getReference("Product/"+idProduct);
+    private void getInforProduct(OrderData orderData, OrderItem_ViewHolder holder){
+        databaseReference = firebaseDatabase.getReference("Product/"+orderData.getIdShop_Order()+"/"+orderData.getIdProduct_Order());
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

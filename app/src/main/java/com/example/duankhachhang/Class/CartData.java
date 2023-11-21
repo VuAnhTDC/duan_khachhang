@@ -6,12 +6,14 @@ public class CartData implements Serializable {
     private String idCart;
     private String idCustomer;
     private String idProduct;
+    private String idShop;
     private int quanlityProduct_Cart;
 
-    public CartData(String idCart, String idCustomer, String idProduct, int quanlityProduct_Cart) {
+    public CartData(String idCart, String idCustomer, String idProduct,String idShop, int quanlityProduct_Cart) {
         this.idCart = idCart;
         this.idCustomer = idCustomer;
         this.idProduct = idProduct;
+        this.idShop = idShop;
         this.quanlityProduct_Cart = quanlityProduct_Cart;
     }
 
@@ -20,6 +22,15 @@ public class CartData implements Serializable {
         this.idCustomer = null;
         this.idProduct = null;
         this.quanlityProduct_Cart = 0;
+        this.idShop = null;
+    }
+
+    public String getIdShop() {
+        return idShop;
+    }
+
+    public void setIdShop(String idShop) {
+        this.idShop = idShop;
     }
 
     @Override

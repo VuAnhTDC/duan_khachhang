@@ -10,6 +10,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
 
@@ -33,11 +35,13 @@ public class PurchaseOrder extends AppCompatActivity {
     }
     private void setEvent(){
 
+
     }
     private void setControl(){
         tabLayout_ScreenOrderList = findViewById(R.id.tabLayout_ScreenOrderList);
         toolBar_OrderList = findViewById(R.id.toolBar_OrderList_Purchase);
         viewPager_ScreenOrderList = findViewById(R.id.viewPager_ScreenOrderList);
+
     }
     private void setIntiazation() {
         orderListViewPagerAdapter = new Order_ListViewPagerAdapter(getSupportFragmentManager(), FragmentStatePagerAdapter.BEHAVIOR_SET_USER_VISIBLE_HINT);

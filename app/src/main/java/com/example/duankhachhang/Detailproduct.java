@@ -3,6 +3,7 @@ package com.example.duankhachhang;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -48,6 +49,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import java.text.NumberFormat;
@@ -76,7 +78,6 @@ public class Detailproduct extends AppCompatActivity {
     private boolean isClickLike = false;
     private boolean isProductInCart = false;
     private Customer customer = new Customer();
-    private String idProduct = "";
     private boolean productIsOutOfStock = false;
     private boolean loadingFirt = false;
     private int countRelatedProducts = 0;
@@ -96,17 +97,23 @@ public class Detailproduct extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailproduct);
         context = this;
-//        customer = new Customer("0123456789", "demo address", "Demo", null);
+        SharedPreferences sharedPreferences = context.getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
+        String jsonShop = sharedPreferences.getString("informationUserCustomer", "");
+        Gson gson = new Gson();
+        customer = gson.fromJson(jsonShop, Customer.class);
         setControl();
         setIniazation();
         getDataProduct();
+        getImageProduct();
+        getInformationProduct();
+        getRealtedProducts(productData.getKeyCategoryProduct(),10);
         checkLikeProductOfCustomer();
         checkProductInCart();
         setEvent();
     }
 
     private void getDataProduct() {
-        databaseReference = firebaseDatabase.getReference("Product/" + idProduct);
+        databaseReference = firebaseDatabase.getReference("Product/" + productData.getIdUserProduct() + "/"+productData.getIdProduct());
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -135,7 +142,8 @@ public class Detailproduct extends AppCompatActivity {
     //    hàm khởi tạo
     private void setIniazation() {
         Intent intent = getIntent();
-        idProduct = intent.getStringExtra("idProduct");
+        productData = (ProductData)intent.getSerializableExtra("Product");
+        System.out.println("pd: " + productData.toString());
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -175,7 +183,7 @@ public class Detailproduct extends AppCompatActivity {
                           LikeProductData likeProductData = new LikeProductData(customer.getId(), productData.getIdProduct());
                           databaseReference.child(customer.getId() + "/" + customer.getId() + productData.getIdProduct()).setValue(likeProductData);
                           productData.setSumLike(productData.getSumLike() + 1);
-                          databaseReference = firebaseDatabase.getReference("Product");
+                          databaseReference = firebaseDatabase.getReference("Product/"+productData.getIdUserProduct());
                           databaseReference.child(productData.getIdProduct()).setValue(productData);
 
                       }
@@ -200,7 +208,7 @@ public class Detailproduct extends AppCompatActivity {
     }
 
     private void getImageProduct() {
-        databaseReference = firebaseDatabase.getReference("ImageProducts/"+idProduct);
+        databaseReference = firebaseDatabase.getReference("ImageProducts/"+productData.getIdProduct());
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -223,7 +231,7 @@ public class Detailproduct extends AppCompatActivity {
 
     private void checkLikeProductOfCustomer() {
         databaseReference = firebaseDatabase.getReference("LikeProduct");
-        Query query = databaseReference.child(customer.getId() + "/" + customer.getId() + idProduct);
+        Query query = databaseReference.child(customer.getId() + "/" + customer.getId() + productData.getIdProduct());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -242,7 +250,7 @@ public class Detailproduct extends AppCompatActivity {
     }
 
     private void checkProductInCart() {
-        databaseReference = firebaseDatabase.getReference("CartCustomer/" + customer.getId() + "/" + idProduct);
+        databaseReference = firebaseDatabase.getReference("CartCustomer/" + customer.getId() + "/" + productData.getIdProduct());
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -310,20 +318,28 @@ public class Detailproduct extends AppCompatActivity {
     //    xuất danh sách sản phẩm liên quan
     private void getRealtedProducts(String keyCategoryProduct, int count) {
         databaseReference = firebaseDatabase.getReference("Product");
-        Query query = databaseReference.orderByChild("keyCategoryProduct").equalTo(keyCategoryProduct);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    for (DataSnapshot item :
-                            snapshot.getChildren()) {
-                        if (count == countRelatedProducts) {
-                            return;
+                for (DataSnapshot itemSnap:
+                     snapshot.getChildren()) {
+                    if (ao <= count){
+                        for (DataSnapshot item:
+                                itemSnap.getChildren()) {
+                            if (ao <= count){
+                                if (item.child("keyCategoryProduct").getKey().toString().equals(keyCategoryProduct)){
+                                    ProductData productData1 = item.getValue(ProductData.class);
+                                    arrRelatedProducts.add(productData1);
+                                    ao ++;
+                                }
+                            }
+                            else {
+                                return;
+                            }
                         }
-                        ProductData productData1 = item.getValue(ProductData.class);
-                        arrRelatedProducts.add(productData1);
-                        relatedProductsAdapter.notifyDataSetChanged();
-                        countRelatedProducts++;
+                    }
+                    else {
+                        return;
                     }
                 }
             }
@@ -333,7 +349,6 @@ public class Detailproduct extends AppCompatActivity {
 
             }
         });
-
 
     }
 
@@ -371,7 +386,7 @@ public class Detailproduct extends AppCompatActivity {
                     databaseReference = firebaseDatabase.getReference("LikeProduct");
                     databaseReference.child(customer.getId() + "/" + customer.getId() + productData.getIdProduct()).removeValue();
                     productData.setSumLike(productData.getSumLike() - 1);
-                    databaseReference = firebaseDatabase.getReference("Product");
+                    databaseReference = firebaseDatabase.getReference("Product/"+productData.getIdUserProduct());
                     databaseReference.child(productData.getIdProduct()).setValue(productData);
                 } else {
                     ao = 1;
@@ -388,7 +403,7 @@ public class Detailproduct extends AppCompatActivity {
                     LikeProductData likeProductData = new LikeProductData(customer.getId(), productData.getIdProduct());
                     databaseReference.child(customer.getId() + "/" + customer.getId() + productData.getIdProduct()).setValue(likeProductData);
                     productData.setSumLike(productData.getSumLike() + 1);
-                    databaseReference = firebaseDatabase.getReference("Product");
+                    databaseReference = firebaseDatabase.getReference("Product/"+productData.getIdUserProduct());
                     databaseReference.child(productData.getIdProduct()).setValue(productData);
                 }
                 vSumlike_DetailProduct.setEnabled(true);
@@ -397,7 +412,7 @@ public class Detailproduct extends AppCompatActivity {
         vSumCmt_DetailProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CommentProductDialogFragment commentProductDialogFragment = new CommentProductDialogFragment(idProduct);
+                CommentProductDialogFragment commentProductDialogFragment = new CommentProductDialogFragment(productData.getIdProduct());
                 commentProductDialogFragment.show(getSupportFragmentManager(), "Đánh giá");
             }
         });
@@ -423,7 +438,7 @@ public class Detailproduct extends AppCompatActivity {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                     String formattedDate = dateFormat.format(date);
                     int priceOrder = productData.getPriceProduct() * 1;
-                    OrderData orderData = new OrderData(customer.getId() + idProduct, customer.getId(), idProduct, productData.getIdUserProduct(), "", 0, formattedDate, customer.getAddress(), customer.getId(), "", 1, priceOrder, "", "");
+                    OrderData orderData = new OrderData(customer.getId() + productData.getIdProduct(), customer.getId(), productData.getIdProduct(), productData.getIdUserProduct(), "", 0, formattedDate, customer.getAddress(), customer.getId(), "", 1, priceOrder, "", "");
                     arrOrder.add(orderData);
                     Intent intent = new Intent(context, Buyproduct.class);
                     intent.putExtra("arrOrder", arrOrder);
@@ -440,7 +455,7 @@ public class Detailproduct extends AppCompatActivity {
                     Intent intent = new Intent(context, CartCustomer.class);
                     startActivity(intent);
                 } else {
-                    CartData cartData = new CartData(productData.getIdProduct(), customer.getId(), productData.getIdProduct(), 1);
+                    CartData cartData = new CartData(productData.getIdProduct(), customer.getId(), productData.getIdProduct(),productData.getIdUserProduct(), 1);
                     databaseReference = firebaseDatabase.getReference("CartCustomer");
                     databaseReference.child(customer.getId() + "/" + cartData.getIdCart()).setValue(cartData).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override

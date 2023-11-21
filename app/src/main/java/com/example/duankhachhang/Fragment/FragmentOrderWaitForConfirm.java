@@ -1,31 +1,49 @@
 package com.example.duankhachhang.Fragment;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
 import com.example.duankhachhang.Class.Customer;
 import com.example.duankhachhang.Class.OrderData;
 import com.example.duankhachhang.R;
+import com.example.duankhachhang.RecyclerView.CartCustomer_ViewHolder;
 import com.example.duankhachhang.RecyclerView.OrderItem_Adaper;
+import com.example.duankhachhang.RecyclerView.OrderItem_ViewHolder;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
+import com.bumptech.glide.request.target.Target;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Locale;
 
 public class FragmentOrderWaitForConfirm extends Fragment {
 
@@ -38,18 +56,23 @@ public class FragmentOrderWaitForConfirm extends Fragment {
     OrderItem_Adaper orderAdaper;
     RecyclerView rcvOrderWaitConfirm;
     private Customer customerData = new Customer();
-    private String shopPhoneNumber;
+    private Runnable runnable = null;
+    private Handler handler = new Handler();
+    private Target<Drawable> itemTaget = null;
+    private RequestBuilder<Drawable> requestBuilder = null;
+    private OrderItem_ViewHolder itemViewHolder;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_order_wait_for_confirm, container, false);
-        SharedPreferences sharedPreferences1 = requireContext().getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
-        String jsonCustomer = sharedPreferences1.getString("informationUserCustomer", "");
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
+        String jsonShop = sharedPreferences.getString("informationUserCustomer", "");
         Gson gson = new Gson();
-        customerData = gson.fromJson(jsonCustomer, Customer.class);
-        loadOrderItem();
+        customerData = gson.fromJson(jsonShop, Customer.class);
+        context = getContext();
         setControl(view);
         setInitiazation();
+        loadOrderItem();
         setEvent();
         return view;
     }
@@ -59,8 +82,87 @@ public class FragmentOrderWaitForConfirm extends Fragment {
         rcvOrderWaitConfirm.setLayoutManager(new LinearLayoutManager(getContext()));
         rcvOrderWaitConfirm.setAdapter(orderAdaper);
         orderAdaper.notifyDataSetChanged();
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                orderAdaper.notifyDataSetChanged();
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                handler.removeCallbacks(runnable);
+                if (itemViewHolder != null) {
+                    itemViewHolder.vCancellItemOrder_ItemOrderList.setVisibility(View.GONE);
+                    itemViewHolder.vInformationOrder_ItemOrderList.setVisibility(View.VISIBLE);
+                    Glide.with(context).clear(itemTaget);
+                    orderAdaper.notifyDataSetChanged();
+                }
+                OrderItem_ViewHolder orderItemViewHolder = (OrderItem_ViewHolder) viewHolder;
+                requestBuilder = Glide.with(context).load(R.drawable.icon_cancell);
+                itemTaget = requestBuilder.into(orderItemViewHolder.ivIconCancelOrder_ItemOrderList);
+                runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        orderItemViewHolder.vInformationOrder_ItemOrderList.setVisibility(View.VISIBLE);
+                        orderItemViewHolder.vCancellItemOrder_ItemOrderList.setVisibility(View.GONE);
+                        orderAdaper.notifyDataSetChanged();
+                    }
+                };
+                handler.postDelayed(runnable, 4000);
+                orderAdaper.notifyDataSetChanged();
+                orderItemViewHolder.vCancellItemOrder_ItemOrderList.setVisibility(View.VISIBLE);
+                orderItemViewHolder.vInformationOrder_ItemOrderList.setVisibility(View.GONE);
+                itemViewHolder = (OrderItem_ViewHolder) viewHolder;
+                orderItemViewHolder.ivIconCancelOrder_ItemOrderList.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                        builder.setTitle("Thông báo");
+                        builder.setMessage("Bạn muốn xóa sản phẩm này ra khỏi giỏ hàng không ?");
+                        builder.setNegativeButton("Có", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                OrderData itemOrder = arrayOrderData.get(position);
+                                cancelItemOrder(itemOrder);
+                                orderAdaper.notifyDataSetChanged();
+                            }
+                        });
+                        builder.setPositiveButton("Không", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                orderAdaper.notifyDataSetChanged();
+                                dialogInterface.dismiss();
+                            }
+                        });
+                        AlertDialog alertDialog = builder.create();
+                        alertDialog.show();
+                    }
+                });
+
+            }
+        });
+        itemTouchHelper.attachToRecyclerView(rcvOrderWaitConfirm);
     }
 
+    private void cancelItemOrder(OrderData orderData){
+        orderData.setStatusOrder(5);
+        databaseReference = firebaseDatabase.getReference("OrderProduct/" + orderData.getIdOrder());
+        databaseReference.setValue(orderData).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                Toast.makeText(context,"Đã hủy đơn hàng",Toast.LENGTH_SHORT);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(context,"Hủy đơn hàng không thành công",Toast.LENGTH_SHORT);
+            }
+        });
+
+    }
     private void setEvent() {
 
     }
@@ -71,35 +173,40 @@ public class FragmentOrderWaitForConfirm extends Fragment {
     }
 
     private void loadOrderItem(){
-        databaseReference = firebaseDatabase.getReference("OrderProduct");
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        databaseReference = firebaseDatabase.getReference("OrderCustomer/"+customerData.getId());
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 arrayOrderData.clear();
-                if (snapshot.exists()) {
-                    for (DataSnapshot shopItem : snapshot.getChildren()) {
-                        if (shopItem.exists()){
-                            for (DataSnapshot oderItem : shopItem.getChildren()){
-                                OrderData orderData = oderItem.getValue(OrderData.class);
-                                if (orderData.getStatusOrder() == 0) {
-                                    if (orderData.getIdCustomer_Order().equals(customerData.getId())){
+               if(snapshot.exists()){
+                   for (DataSnapshot itemIdOrder:
+                           snapshot.getChildren()) {
+                       String idOrderItem = itemIdOrder.getKey();
+                       System.out.println("id order: "+idOrderItem);
+                        DatabaseReference databaseReference1 = firebaseDatabase.getReference("OrderProduct/"+idOrderItem);
+                        databaseReference1.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if(snapshot.exists()){
+                                    OrderData orderData = snapshot.getValue(OrderData.class);
+                                    if (orderData.getStatusOrder() == 0){
                                         arrayOrderData.add(orderData);
-                                        System.out.println("order item: " + orderData.toString());
                                     }
+                                    else {
+                                        arrayOrderData.removeIf(element->element.getIdOrder().equals(orderData.getIdOrder()));
+                                    }
+                                    Collections.reverse(arrayOrderData);
+                                    orderAdaper.notifyDataSetChanged();
                                 }
                             }
-                        }
 
-                    }
-                }
-                if (arrayOrderData.size() <= 0) {
-                    tvNoOrderWaitConfirm.setVisibility(View.VISIBLE);
-                    rcvOrderWaitConfirm.setVisibility(View.GONE);
-                } else {
-                    tvNoOrderWaitConfirm.setVisibility(View.GONE);
-                    rcvOrderWaitConfirm.setVisibility(View.VISIBLE);
-                }
-                orderAdaper.notifyDataSetChanged();
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                   }
+               }
             }
 
             @Override
