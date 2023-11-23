@@ -36,14 +36,12 @@ public class CommentProductDialogFragment extends DialogFragment {
 
     public CommentProductDialogFragment(String idProduct) {
         this.idProduct = idProduct;
-        System.out.println("idproduct cmt: " + idProduct);
         getDataComment();
     }
 
     private void getDataComment() {
-        databaseReference = firebaseDatabase.getReference("CommentProduct");
-        Query query = databaseReference.orderByChild("idProduct").equalTo(idProduct);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference = firebaseDatabase.getReference("CommentProduct/" +idProduct);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 loadingCmt = true;
@@ -51,7 +49,6 @@ public class CommentProductDialogFragment extends DialogFragment {
                     for (DataSnapshot commentItem :
                             snapshot.getChildren()) {
                         CommentData commentData = commentItem.getValue(CommentData.class);
-
                         arrCommentProduct.add(commentData);
                     }
                 }

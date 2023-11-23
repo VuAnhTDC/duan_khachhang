@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -121,7 +122,7 @@ public class FragmentOrderWaitForConfirm extends Fragment {
                     public void onClick(View view) {
                         AlertDialog.Builder builder = new AlertDialog.Builder(context);
                         builder.setTitle("Thông báo");
-                        builder.setMessage("Bạn muốn xóa sản phẩm này ra khỏi giỏ hàng không ?");
+                        builder.setMessage("Bạn có muốn hủy đơn hàng này không ?");
                         builder.setNegativeButton("Có", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
@@ -142,6 +143,11 @@ public class FragmentOrderWaitForConfirm extends Fragment {
                     }
                 });
 
+            }
+
+            @Override
+            public void onSelectedChanged(@Nullable RecyclerView.ViewHolder viewHolder, int actionState) {
+                super.onSelectedChanged(viewHolder, actionState);
             }
         });
         itemTouchHelper.attachToRecyclerView(rcvOrderWaitConfirm);

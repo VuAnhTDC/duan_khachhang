@@ -26,6 +26,9 @@
         android:theme="@style/Theme.Duankhachhang"
         tools:targetApi="31">
         <activity
+            android:name=".InputCommentProduct"
+            android:exported="false" />
+        <activity
             android:name=".VorcherProduct"
             android:exported="false" />
 
@@ -46,7 +49,9 @@
             android:exported="false" />
         <activity
             android:name=".InformationSettings"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize"
+            />
         <activity
             android:name=".PurchaseOrder"
             android:exported="false" />

@@ -180,18 +180,13 @@ public class CartCustomer_Adapter extends RecyclerView.Adapter<CartCustomer_View
 
 //    lấy hình sản phẩm
     private void setImageProduct(String idProduct, CartCustomer_ViewHolder holder){
-        databaseReference = firebaseDatabase.getReference("ImageProducts");
-        Query query = databaseReference.orderByChild("idProduct").equalTo(idProduct);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference = firebaseDatabase.getReference("ImageProducts/"+idProduct+"/1");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
-                    for (DataSnapshot itemImage:
-                         snapshot.getChildren()) {
-                        Image image = itemImage.getValue(Image.class);
-                        Picasso.get().load(image.getUrlImage()).placeholder(R.drawable.icondowload).into(holder.ivProduct_ItemCartCustomer);
-                        return;
-                    }
+                   String urlImage =  snapshot.child("urlImage").getValue().toString();
+                   Picasso.get().load(urlImage).placeholder(R.drawable.icondowload).into(holder.ivProduct_ItemCartCustomer);
                 }
             }
 

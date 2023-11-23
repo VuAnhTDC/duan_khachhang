@@ -143,7 +143,6 @@ public class Detailproduct extends AppCompatActivity {
     private void setIniazation() {
         Intent intent = getIntent();
         productData = (ProductData)intent.getSerializableExtra("Product");
-        System.out.println("pd: " + productData.toString());
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -180,7 +179,7 @@ public class Detailproduct extends AppCompatActivity {
                               }
                           }, 1000);
                           databaseReference = firebaseDatabase.getReference("LikeProduct");
-                          LikeProductData likeProductData = new LikeProductData(customer.getId(), productData.getIdProduct());
+                          LikeProductData likeProductData = new LikeProductData(customer.getId(), productData.getIdProduct(),productData.getIdUserProduct());
                           databaseReference.child(customer.getId() + "/" + customer.getId() + productData.getIdProduct()).setValue(likeProductData);
                           productData.setSumLike(productData.getSumLike() + 1);
                           databaseReference = firebaseDatabase.getReference("Product/"+productData.getIdUserProduct());
@@ -400,7 +399,7 @@ public class Detailproduct extends AppCompatActivity {
                         }
                     }, 1000);
                     databaseReference = firebaseDatabase.getReference("LikeProduct");
-                    LikeProductData likeProductData = new LikeProductData(customer.getId(), productData.getIdProduct());
+                    LikeProductData likeProductData = new LikeProductData(customer.getId(), productData.getIdProduct(),productData.getIdUserProduct());
                     databaseReference.child(customer.getId() + "/" + customer.getId() + productData.getIdProduct()).setValue(likeProductData);
                     productData.setSumLike(productData.getSumLike() + 1);
                     databaseReference = firebaseDatabase.getReference("Product/"+productData.getIdUserProduct());
@@ -443,7 +442,6 @@ public class Detailproduct extends AppCompatActivity {
                     Intent intent = new Intent(context, Buyproduct.class);
                     intent.putExtra("arrOrder", arrOrder);
                     startActivity(intent);
-                    finish();
                 }
             }
         });

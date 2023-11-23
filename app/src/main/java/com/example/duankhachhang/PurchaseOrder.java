@@ -24,6 +24,8 @@ public class PurchaseOrder extends AppCompatActivity {
     ViewPager viewPager_ScreenOrderList;
     Order_ListViewPagerAdapter orderListViewPagerAdapter;
     Context context;
+    private  int itemPosition = 0;
+    private boolean permissionScrollViewpager = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +36,6 @@ public class PurchaseOrder extends AppCompatActivity {
         context = this;
     }
     private void setEvent(){
-
 
     }
     private void setControl(){

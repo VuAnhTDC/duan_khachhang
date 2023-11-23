@@ -50,19 +50,33 @@ public class LikeProductAdapter extends RecyclerView.Adapter<LikeProductViewHold
     @Override
     public void onBindViewHolder(@NonNull LikeProductViewHolder holder, int position) {
         LikeProductData likeProductData = list.get(position);
-        setInformationLikeProductItem(likeProductData.getIdProduct_LikeProduct(),holder);
+        setInformationLikeProductItem(likeProductData,holder);
         setImageProduct(likeProductData.getIdProduct_LikeProduct(),holder);
         holder.card_item_product.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, Detailproduct.class);
-                intent.putExtra("idProduct", likeProductData.getIdProduct_LikeProduct());
-                context.startActivity(intent);
+                databaseReference = firebaseDatabase.getReference("Product/"+likeProductData.getIdShop()+"/"+likeProductData.getIdProduct_LikeProduct());
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()){
+                            ProductData productData = snapshot.getValue(ProductData.class);
+                            Intent intent = new Intent(context, Detailproduct.class);
+                            intent.putExtra("Product", productData);
+                            context.startActivity(intent);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
             }
         });
     }
-    private void setInformationLikeProductItem(String idProduct, LikeProductViewHolder holder){
-        databaseReference = firebaseDatabase.getReference("Product").child(idProduct);
+    private void setInformationLikeProductItem(LikeProductData likeProductData, LikeProductViewHolder holder){
+        databaseReference = firebaseDatabase.getReference("Product/"+likeProductData.getIdShop() +"/"+likeProductData.getIdProduct_LikeProduct());
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -80,28 +94,28 @@ public class LikeProductAdapter extends RecyclerView.Adapter<LikeProductViewHold
             }
         });
     }
-    private void setInformationLikeProducts(String idCustomer ,LikeProductViewHolder holder){
-        databaseReference = firebaseDatabase.getReference("LikeProduct/"+idCustomer);
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()){
-                    for (DataSnapshot itemLike: snapshot.getChildren()){
-                        LikeProductData likeProduct = itemLike.getValue(LikeProductData.class);
-                        setInformationLikeProductItem(likeProduct.getIdProduct_LikeProduct(),holder);
-                        setImageProduct(likeProduct.getIdProduct_LikeProduct(), holder);
-                    }
-                }else {
-                    System.out.println("không tìm thấy " + idCustomer );
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                System.out.println("Lỗi khi đọc dữ liệu từ cơ sở dữ liệu (các sản phẩm đã thích): " + error.getMessage());
-            }
-        });
-    }
+//    private void setInformationLikeProducts(String idCustomer ,LikeProductViewHolder holder){
+//        databaseReference = firebaseDatabase.getReference("LikeProduct/"+idCustomer);
+//        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if (snapshot.exists()){
+//                    for (DataSnapshot itemLike: snapshot.getChildren()){
+//                        LikeProductData likeProduct = itemLike.getValue(LikeProductData.class);
+//                        setInformationLikeProductItem(likeProduct.getIdProduct_LikeProduct(),holder);
+//                        setImageProduct(likeProduct.getIdProduct_LikeProduct(), holder);
+//                    }
+//                }else {
+//                    System.out.println("không tìm thấy " + idCustomer );
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//                System.out.println("Lỗi khi đọc dữ liệu từ cơ sở dữ liệu (các sản phẩm đã thích): " + error.getMessage());
+//            }
+//        });
+//    }
 
     private void setImageProduct(String idProduct, LikeProductViewHolder holder){
         databaseReference = firebaseDatabase.getReference("ImageProducts/" +idProduct+"/1");

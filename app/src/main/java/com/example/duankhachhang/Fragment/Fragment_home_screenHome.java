@@ -124,8 +124,14 @@ public class Fragment_home_screenHome extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
     //    hàm lấy số lượng sản phẩm trong giỏ hàng --- người dùng
     private void setCountProductCartUser() {
+        System.out.println("customer: " +customer.toString());
 //        Truy cập bảng giỏ hàng vào node người dùng trên firebase
         databaseReference = firebaseDatabase.getReference("CartCustomer/" + customer.getId());
 //        lắng nghe sự kiện

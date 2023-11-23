@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class LikeProductData implements Serializable {
     private String idCustomer_LikeProduct;
     private String idProduct_LikeProduct;
+    private String idShop;
 
     @Override
     public String toString() {
@@ -33,8 +34,17 @@ public class LikeProductData implements Serializable {
     public LikeProductData() {
     }
 
-    public LikeProductData(String idCustomer_LikeProduct, String idProduct_LikeProduct) {
+    public String getIdShop() {
+        return idShop;
+    }
+
+    public void setIdShop(String idShop) {
+        this.idShop = idShop;
+    }
+
+    public LikeProductData(String idCustomer_LikeProduct, String idProduct_LikeProduct,String idShop) {
         this.idCustomer_LikeProduct = idCustomer_LikeProduct;
         this.idProduct_LikeProduct = idProduct_LikeProduct;
+        this.idShop = idShop;
     }
 }

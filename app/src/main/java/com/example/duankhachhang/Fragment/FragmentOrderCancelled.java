@@ -86,7 +86,7 @@ public class FragmentOrderCancelled extends Fragment {
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if(snapshot.exists()){
                                     OrderData orderData = snapshot.getValue(OrderData.class);
-                                    if (orderData.getStatusOrder() == 4){
+                                    if (orderData.getStatusOrder() == 5){
                                         arrayOrderData.add(orderData);
                                     }
                                     else {
