@@ -28,8 +28,11 @@ import android.widget.Toast;
 
 import com.example.duankhachhang.Class.Customer;
 import com.example.duankhachhang.Class.OrderData;
+import com.example.duankhachhang.Class.PercentDiscount;
 import com.example.duankhachhang.Class.ProductData;
 import com.example.duankhachhang.Class.ShopData;
+import com.example.duankhachhang.Class.Voucher;
+import com.example.duankhachhang.Class.VoucherCustomer;
 import com.example.duankhachhang.Dialog.EditDeliveryAddressCustomerDialogFragment;
 import com.example.duankhachhang.Fragment.Fragment_home_screenHome;
 import com.example.duankhachhang.Model.NotificationType;
@@ -68,15 +71,16 @@ public class Buyproduct extends AppCompatActivity {
 
     OrderProduct_Adapter orderProductAdapter;
     ArrayList<OrderData> arrOrderData = new ArrayList<>();
+    private String idVoucher = "";
     Context context;
     Customer customer = new Customer();
     private int sumPriceAllProductOrder = 0;
     private int sumPriceAll = 0;
     private boolean changeDeliveryAddress = false;
     private String fcmToken = "";
-    private boolean isTransaction = true;
+    private int positionOrderAdd = 0;
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    DatabaseReference  databaseReference;
+    DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,22 +102,23 @@ public class Buyproduct extends AppCompatActivity {
         customer = gson.fromJson(jsonShop, Customer.class);
         Intent intent = getIntent();
         this.arrOrderData = (ArrayList<OrderData>) intent.getSerializableExtra("arrOrder");
-        orderProductAdapter = new OrderProduct_Adapter(arrOrderData, context);
+        idVoucher = intent.getStringExtra("idVoucher");
+        OrderProduct_Adapter.SetQuanlityProduct setQuanlityProduct = new OrderProduct_Adapter.SetQuanlityProduct() {
+            @Override
+            public void getQuanlytiProduct(int price,int postion,int quanlity) {
+               arrOrderData.get(postion).setQuanlity_Order(quanlity);
+               arrOrderData.get(postion).setPrice_Order(price);
+               getSumPriceAllProduct();
+            }
+        };
+        orderProductAdapter = new OrderProduct_Adapter(arrOrderData, context,setQuanlityProduct);
         rcvOrderList_OrderProduct.setLayoutManager(new LinearLayoutManager(context));
         rcvOrderList_OrderProduct.setAdapter(orderProductAdapter);
 
         tvNumberphone_OrderProduct.setText(customer.getName());
         tvNumberphone_OrderProduct.setText(customer.getId());
         tvAddressUser_OrderProduct.setText(customer.getAddress());
-        for (OrderData orderData : arrOrderData) {
-            sumPriceAllProductOrder += orderData.getPrice_Order();
-        }
-        Locale locale = new Locale("vi","VN");
-        NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
-        tvSumPriceProduct_OrderProduct.setText(numberFormat.format(sumPriceAllProductOrder) +"VND");
-        sumPriceAll = sumPriceAllProductOrder + 25000 + 0;
-        tvSumMoney_OrderProduct.setText(numberFormat.format(sumPriceAll) + "VND");
-
+        getSumPriceAllProduct();
     }
 
     @Override
@@ -122,6 +127,54 @@ public class Buyproduct extends AppCompatActivity {
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+    private void getSumPriceAllProduct(){
+        sumPriceAllProductOrder =0;
+        sumPriceAll = 0;
+        for (OrderData orderData : arrOrderData) {
+            sumPriceAllProductOrder += orderData.getPrice_Order();
+        }
+        Locale locale = new Locale("vi", "VN");
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+        tvSumPriceProduct_OrderProduct.setText(numberFormat.format(sumPriceAllProductOrder) + "VND");
+        sumPriceAll = sumPriceAllProductOrder + 25000 + 0;
+        tvSumMoney_OrderProduct.setText(numberFormat.format(sumPriceAll) + "VND");
+        if (!idVoucher.isEmpty()){
+            databaseReference = firebaseDatabase.getReference("Voucher/" + arrOrderData.get(0).getIdShop_Order() +"/"+arrOrderData.get(0).getIdProduct_Order()+"/"+idVoucher);
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()){
+                        Voucher voucher = snapshot.getValue(Voucher.class);
+                        databaseReference = firebaseDatabase.getReference("PercentVoucher/" + voucher.getIdItemPercentDiscount());
+                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if(snapshot.exists()){
+                                    System.out.println("giam gia");
+                                    PercentDiscount percentDiscount = snapshot.getValue(PercentDiscount.class);
+                                    int moneyVoucher = (arrOrderData.get(0).getPrice_Order() * percentDiscount.getPercent()/100);
+                                    tvVoucher_OrderProduct.setText("- " +numberFormat.format((arrOrderData.get(0).getPrice_Order() * percentDiscount.getPercent()/100)) + " VND");
+                                    sumPriceAll -=moneyVoucher;
+                                    arrOrderData.get(0).setPrice_Order(arrOrderData.get(0).getPrice_Order()-moneyVoucher);
+                                    tvSumMoney_OrderProduct.setText(numberFormat.format(sumPriceAll));
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
     }
 
     private void setEvent() {
@@ -166,174 +219,235 @@ public class Buyproduct extends AppCompatActivity {
                 EditDeliveryAddressCustomerDialogFragment.DeliveryAddress deliveryAddress = new EditDeliveryAddressCustomerDialogFragment.DeliveryAddress() {
                     @Override
                     public void getDeliveryAddress(String deliveryAddress) {
-                        if(deliveryAddress != null && !deliveryAddress.isEmpty()){
+                        if (deliveryAddress != null && !deliveryAddress.isEmpty()) {
                             tvAddressUser_OrderProduct.setText(deliveryAddress);
                             changeDeliveryAddress = true;
-                        }
-                        else {
+                        } else {
                             changeDeliveryAddress = false;
                         }
                     }
                 };
                 EditDeliveryAddressCustomerDialogFragment editDeliveryAddressCustomerDialogFragment = new EditDeliveryAddressCustomerDialogFragment(deliveryAddress);
-                editDeliveryAddressCustomerDialogFragment.show(getSupportFragmentManager(),"Sửa địa chỉ nhận hàng");
+                editDeliveryAddressCustomerDialogFragment.show(getSupportFragmentManager(), "Sửa địa chỉ nhận hàng");
             }
         });
     }
 
-    private void pushDataOrderToFirebase(){
-        for (OrderData itemOrder:
-             arrOrderData) {
-            if (changeDeliveryAddress){
-                itemOrder.setDeliveryAddress(tvAddressUser_OrderProduct.getText().toString());
-            }
-            databaseReference = firebaseDatabase.getReference("Product/"+itemOrder.getIdShop_Order() +"/"+itemOrder.getIdProduct_Order());
-            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (snapshot.exists()){
-                        ProductData productData = snapshot.getValue(ProductData.class);
-                        if((productData.getQuanlityProduct() - itemOrder.getQuanlity_Order()) <=0 ){
-                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                            builder.setTitle("Thông báo");
-                            builder.setMessage("Sản phẩm có mã: " + itemOrder.getIdProduct_Order() + " có số lượng không đủ đáp ứng bạn. Bạn có muốn lấy hết số lượng còn lại của sản phẩm không?");
-                            builder.setNegativeButton("Có", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                   if(isTransaction){
-                                       buyProduct(itemOrder,productData,itemOrder.getQuanlity_Order());
-                                   }
-                                }
-                            });
-                            builder.setPositiveButton("Không", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    dialogInterface.dismiss();
-                                }
-                            });
-                        }
-//                        productData.setQuanlityProduct(productData.getQuanlityProduct() - itemOrder.getQuanlity_Order());
-//                        databaseReference.setValue(productData).addOnSuccessListener(new OnSuccessListener<Void>() {
+    private void pushDataOrderToFirebase() {
+        System.out.println("po:" + positionOrderAdd);
+        OrderData itemOrder = arrOrderData.get(positionOrderAdd);
+        if (changeDeliveryAddress) {
+            itemOrder.setDeliveryAddress(tvAddressUser_OrderProduct.getText().toString());
+        }
+        databaseReference = firebaseDatabase.getReference("Product/" + itemOrder.getIdShop_Order() + "/" + itemOrder.getIdProduct_Order());
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    ProductData productData = snapshot.getValue(ProductData.class);
+//                    if ((productData.getQuanlityProduct() - itemOrder.getQuanlity_Order()) < 0) {
+//                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+//                        builder.setTitle("Thông báo");
+//                        builder.setMessage("Sản phẩm có mã: " + itemOrder.getIdProduct_Order() + " có số lượng không đủ đáp ứng bạn. Bạn có muốn lấy hết số lượng còn lại của sản phẩm không?");
+//                        builder.setNegativeButton("Có", new DialogInterface.OnClickListener() {
 //                            @Override
-//                            public void onSuccess(Void unused) {
-//                                databaseReference = firebaseDatabase.getReference("OrderProduct");
-//                                String keyPush = databaseReference.push().toString().substring(databaseReference.push().toString().lastIndexOf("/"));
-//                                itemOrder.setIdOrder(keyPush.substring(1));
-//                                databaseReference.child(itemOrder.getIdOrder()).setValue(itemOrder).addOnFailureListener(new OnFailureListener() {
-//                                    @Override
-//                                    public void onFailure(@NonNull Exception e) {
-//                                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-//                                        builder.setTitle("Thông báo");
-//                                        builder.setMessage("Lỗi khi mua hàng");
-//                                        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
-//                                            @Override
-//                                            public void onClick(DialogInterface dialogInterface, int i) {
-//                                                dialogInterface.dismiss();
-//                                            }
-//                                        });
-//                                        AlertDialog alertDialog = builder.create();
-//                                        alertDialog.show();
-//                                    }
-//
-//                                }).addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                    @Override
-//                                    public void onSuccess(Void unused) {
-//                                        databaseReference = firebaseDatabase.getReference("CartCustomer/" + itemOrder.getIdCustomer_Order()+"/"+itemOrder.getIdProduct_Order());
-//                                        databaseReference.removeValue();
-//                                        sendMessageToShop(itemOrder);
-////                                        addOrderCustomer(itemOrder);
-////                                        addOrderToShop(itemOrder);
-//
-//                                    }
-//                                });
-//                                Toast.makeText(context, "Đã mua hàng thành công",Toast.LENGTH_SHORT).show();
-//                                finish();
+//                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                buyProduct(itemOrder, productData, itemOrder.getQuanlity_Order());
+////                                setQuanlityProductToFirebase(itemOrder,productData);
 //                            }
 //                        });
-                        else {
-                           if(isTransaction){
-                               buyProduct(itemOrder,productData,itemOrder.getQuanlity_Order());
-                           }
-                        }
-                    }
+//                        builder.setPositiveButton("Không", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                dialogInterface.dismiss();
+//                            }
+//                        });
+//                    } else {
+//                        buyProduct(itemOrder, productData, itemOrder.getQuanlity_Order());
+//                    }
+
+                        productData.setQuanlityProduct(productData.getQuanlityProduct() - itemOrder.getQuanlity_Order());
+                        databaseReference.setValue(productData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                databaseReference = firebaseDatabase.getReference("OrderProduct");
+                                String keyPush = databaseReference.push().toString().substring(databaseReference.push().toString().lastIndexOf("/"));
+                                itemOrder.setIdOrder(keyPush.substring(1));
+                                databaseReference.child(itemOrder.getIdOrder()).setValue(itemOrder).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                                        builder.setTitle("Thông báo");
+                                        builder.setMessage("Lỗi khi mua hàng");
+                                        builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                dialogInterface.dismiss();
+                                            }
+                                        });
+                                        AlertDialog alertDialog = builder.create();
+                                        alertDialog.show();
+                                        positionOrderAdd ++;
+                                        if(positionOrderAdd < arrOrderData.size()){
+                                            pushDataOrderToFirebase();
+                                        }
+                                        else {
+                                            finish();
+                                        }
+
+                                    }
+
+                                }).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        databaseReference = firebaseDatabase.getReference("CartCustomer/" + itemOrder.getIdCustomer_Order()+"/"+itemOrder.getIdProduct_Order());
+                                        databaseReference.removeValue();
+                                        sendMessageToShop(itemOrder);
+                                        getAndSaveFCMToken(itemOrder.getIdOrder());
+                                        addOrderCustomer(itemOrder);
+                                        positionOrderAdd ++;
+                                        if (!idVoucher.isEmpty())
+                                        {
+                                            databaseReference = firebaseDatabase.getReference("VoucherCustomer/"+customer.getId()+"/"+idVoucher);
+                                            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                    if (snapshot.exists()){
+                                                        VoucherCustomer voucherCustomer = snapshot.getValue(VoucherCustomer.class);
+                                                        voucherCustomer.setStatus(false);
+                                                        databaseReference.setValue(voucherCustomer);
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                                }
+                                            });
+                                        }
+                                        if(positionOrderAdd < arrOrderData.size()){
+                                            pushDataOrderToFirebase();
+                                        }
+                                        else {
+                                            finish();
+                                        }
+                                    }
+                                });
+                            }
+                        });
                 }
+            }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
 
-                }
-            });
-
-        }
-        finish();
-
+            }
+        });
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        isTransaction = false;
+    //    hàm thêm order vào orderCustomer
+    private void addOrderCustomer(OrderData orderData) {
+        databaseReference = firebaseDatabase.getReference("OrderCustomer/" + orderData.getIdCustomer_Order() + "/" + orderData.getIdOrder());
+        databaseReference.child("idItemOrder").setValue(orderData.getIdOrder()).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+                addOrderShop(orderData);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
     }
 
-    //    hàm xử lý dữ liệu khi mua hàng
-    private void buyProduct(OrderData orderData, ProductData productData, int quanlity){
-        databaseReference = firebaseDatabase.getReference();
+    //    hàm lưu order vào orderShop
+    private void addOrderShop(OrderData orderData) {
+        databaseReference = firebaseDatabase.getReference("OrderShop/" + orderData.getIdShop_Order() + "/" + orderData.getIdOrder());
+        databaseReference.child("idItemOrder").setValue(orderData.getIdOrder()).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+            }
+        });
+    }
+
+
+    //    hàm xử lý dữ liệu khi mua hàng ===> có dùng transaction ---> bị lỗi
+    private void buyProduct(OrderData orderData, ProductData productData, int quanlity) {
+        databaseReference = FirebaseDatabase.getInstance().getReference();
         String idOrder = databaseReference.push().toString().substring(databaseReference.push().toString().lastIndexOf("/"));
+        idOrder.substring(1);
+        orderData.setIdOrder(idOrder);
         databaseReference.runTransaction(new Transaction.Handler() {
             @NonNull
             @Override
             public Transaction.Result doTransaction(@NonNull MutableData currentData) {
-               if ((productData.getQuanlityProduct() - quanlity) <=0){
-                   productData.setQuanlityProduct(0);
-                   orderData.setQuanlity_Order(productData.getQuanlityProduct());
-               }
-               else {
-                   productData.setQuanlityProduct((productData.getQuanlityProduct() - quanlity));
-               }
+                if ((productData.getQuanlityProduct() - quanlity) <= 0) {
+                    productData.setQuanlityProduct(0);
+                    orderData.setQuanlity_Order(productData.getQuanlityProduct());
+                } else {
+                    productData.setQuanlityProduct((productData.getQuanlityProduct() - quanlity));
+                }
 //               set lại số lượng sản phẩm
-               DatabaseReference productRef = databaseReference.child("Product/"+productData.getIdUserProduct()+"/"+productData.getIdProduct());
-               productRef.setValue(productData);
+               databaseReference = FirebaseDatabase.getInstance().getReference().child("Product/" + productData.getIdUserProduct() + "/" + productData.getIdProduct());
+                databaseReference.setValue(productData);
 
 //               Thêm đơn hàng vào bảng OrderProduct
-                DatabaseReference orderProductRef = databaseReference.child("OrderProduct");
-                orderProductRef.child(idOrder).setValue(orderData);
+                databaseReference = FirebaseDatabase.getInstance().getReference().child("OrderProduct");
+                databaseReference.child(idOrder).setValue(orderData);
 
 //                Thêm id đơn hàng vào bảng đơn hàng của khách hàng
-                DatabaseReference orderCustomerRef = databaseReference.child("OrderCustomer/"+orderData.getIdCustomer_Order());
-                orderCustomerRef.child(idOrder).child("idItemOrder").setValue(idOrder);
+                databaseReference = FirebaseDatabase.getInstance().getReference().child("OrderCustomer/" + orderData.getIdCustomer_Order());
+                databaseReference.child(idOrder).child("idItemOrder").setValue(idOrder);
 
 //                Thêm id đơn hàng vào bảng đơn hàng của cửa hàng
-                DatabaseReference orderShopRef = databaseReference.child("OrderShop/"+orderData.getIdShop_Order());
-                orderShopRef.child(idOrder).child("idItemOrder").setValue(idOrder);
+                databaseReference = FirebaseDatabase.getInstance().getReference().child("OrderShop/" + orderData.getIdShop_Order());
+                databaseReference.child(idOrder).child("idItemOrder").setValue(idOrder);
 
 //                Gửi tin nhắn tới shop
                 sendMessageToShop(orderData);
 //                    gửi thông
                 getAndSaveFCMToken(idOrder);
+                positionOrderAdd += 1;
+//                if (positionOrderAdd >= arrOrderData.size()){
+//                    finish();
+//                }
+                if (positionOrderAdd < arrOrderData.size()) {
+                    pushDataOrderToFirebase();
+                } else {
+                    finish();
+                }
                 return Transaction.success(currentData);
             }
 
             @Override
             public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
 //                bị lỗi
-                if(error != null || !committed){
-                    databaseReference.child("OrderProduct/"+idOrder).removeValue();
-                    databaseReference.child("OrderCustomer/"+orderData.getIdCustomer_Order()+"/"+idOrder).removeValue();
-                    databaseReference.child("OrderShop/"+orderData.getIdShop_Order()+"/"+idOrder).removeValue();
+                if (error != null || !committed) {
+                    databaseReference.child("OrderProduct/" + idOrder).removeValue();
+                    databaseReference.child("OrderCustomer/" + orderData.getIdCustomer_Order() + "/" + idOrder).removeValue();
+                    databaseReference.child("OrderShop/" + orderData.getIdShop_Order() + "/" + idOrder).removeValue();
+                    positionOrderAdd++;
+                    if (positionOrderAdd < arrOrderData.size()) {
+                        pushDataOrderToFirebase();
+                    } else {
+                        finish();
+                    }
                 }
             }
         });
     }
 
 
-    private void sendMessageToShop(OrderData orderData){
-        databaseReference = firebaseDatabase.getReference("Shop/"+orderData.getIdShop_Order());
+    private void sendMessageToShop(OrderData orderData) {
+        databaseReference = firebaseDatabase.getReference("Shop/" + orderData.getIdShop_Order());
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()){
+                if (snapshot.exists()) {
                     ShopData shopData = snapshot.getValue(ShopData.class);
-                    SendNotification.getSendNotificationOrderSuccessFull(shopData.getFcmToken(),"Đơn đặt hàng","Đơn hàng có mã: " + orderData.getIdOrder() +"\n sản phẩm: " +orderData.getIdProduct_Order(),NotificationType.NotificationNormal());
+                    SendNotification.getSendNotificationOrderSuccessFull(shopData.getFcmToken(), "Đơn đặt hàng", "Đơn hàng có mã: " + orderData.getIdOrder() + "\n sản phẩm: " + orderData.getIdProduct_Order(), NotificationType.NotificationNormal());
                 }
             }
 
@@ -351,7 +465,7 @@ public class Buyproduct extends AppCompatActivity {
                     public void onComplete(@NonNull Task<String> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             fcmToken = task.getResult();
-                            SendNotification.getSendNotificationOrderSuccessFull(fcmToken,"Kết quả đơn đặt hàng","Đơn đặt hàng có mã: "+idOrder+" của bạn đã được chuyển sang người bán hàng", NotificationType.NotificationOrder());
+                            SendNotification.getSendNotificationOrderSuccessFull(fcmToken, "Kết quả đơn đặt hàng", "Đơn đặt hàng có mã: " + idOrder + " của bạn đã được chuyển sang người bán hàng", NotificationType.NotificationOrder());
                             System.out.println("fcmToken: " + fcmToken);
                         } else {
                             System.out.println("Không lấy và lưu được fcm token");

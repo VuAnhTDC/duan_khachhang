@@ -19,7 +19,7 @@ public class EditQuanlityItemOrderProductDialogFragment extends DialogFragment {
     private EditQuanlityItemOrderProductDialogFragment.EditQuanlityOrderProductItem quanlityOrderProductItem;
     View viewDialog;
     public  interface EditQuanlityOrderProductItem {
-        public int getQuanlityOrderProductItem(int quanlityOrderProductItem);
+        public void getQuanlityOrderProductItem(int quanlityOrderProductItem);
     }
 
     public EditQuanlityItemOrderProductDialogFragment(EditQuanlityItemOrderProductDialogFragment.EditQuanlityOrderProductItem quanlityOrderProductItem){

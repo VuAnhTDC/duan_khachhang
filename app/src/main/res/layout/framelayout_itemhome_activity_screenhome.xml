@@ -18,6 +18,7 @@
             android:orientation="horizontal">
 
             <FrameLayout
+                android:id="@+id/vCountVoucherCustomer"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_marginRight="10dp">
@@ -28,6 +29,7 @@
                     android:src="@drawable/icon_discountcode" />
 
                 <TextView
+                    android:id="@+id/tvCountVoucher"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"

@@ -1,7 +1,6 @@
 package com.example.duankhachhang;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -10,9 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,12 +20,13 @@ import android.widget.TextView;
 
 import com.example.duankhachhang.Class.ProductData;
 import com.example.duankhachhang.Class.ShopData;
+import com.example.duankhachhang.Class.Voucher;
 import com.example.duankhachhang.RecyclerView.ProductListHome_Adapter;
+import com.example.duankhachhang.RecyclerView.VoucherItemDetailShop_Adapter;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
@@ -40,11 +38,13 @@ public class DetailShop extends AppCompatActivity {
 
     CircleImageView ivAvataShop_DetailShop;
     TextView tvNameShop_DetailShop, tvAddressShop_DetailShop, tvAddressEmailShop_DetailShop, tvPhoneShop_DetailShop, tvLinkFacebook_DetailShop;
-    RecyclerView rcvListProductBuy_DetailShop;
+    RecyclerView rcvListProductBuy_DetailShop,rcvMyVoucher_Shop;
     Toolbar toolBar_DetailShop;
     ProductListHome_Adapter productListAdapter;
     LinearLayout vFaceBook_DetailShop;
     ArrayList<ProductData> arrProduct = new ArrayList<>();
+    ArrayList<Voucher> arrVoucher = new ArrayList<>();
+    VoucherItemDetailShop_Adapter voucherItemAdapter;
     String idShop = "";
     Context context;
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
@@ -62,6 +62,7 @@ public class DetailShop extends AppCompatActivity {
         getDataProduct_IdShop();
         getDataShop_IdShop();
         getLinkFacebook_Shop();
+        getVoucherShop();
         setEvent();
     }
 
@@ -76,8 +77,39 @@ public class DetailShop extends AppCompatActivity {
         Intent intent = getIntent();
         idShop = intent.getStringExtra("idShop");
 
+//        Gán giá trị cho VoucherAdapter
+        voucherItemAdapter = new VoucherItemDetailShop_Adapter(arrVoucher,context);
+        rcvMyVoucher_Shop.setLayoutManager(new LinearLayoutManager(context));
+        rcvMyVoucher_Shop.setAdapter(voucherItemAdapter);
         setSupportActionBar(toolBar_DetailShop);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+//    hàm lấy danh sach voucher của shop
+    private void getVoucherShop(){
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Voucher/"+idShop);
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+                    for (DataSnapshot itemProduct:
+                            snapshot.getChildren()) {
+                        for (DataSnapshot itemVoucherOfProduct:
+                                itemProduct.getChildren()) {
+                            Voucher itemVoucher = itemVoucherOfProduct.getValue(Voucher.class);
+                            arrVoucher.add(itemVoucher);
+                            voucherItemAdapter.notifyDataSetChanged();
+                        }
+
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     @Override
@@ -135,9 +167,8 @@ public class DetailShop extends AppCompatActivity {
     }
 
     private void getDataProduct_IdShop() {
-        databaseReference = firebaseDatabase.getReference("Product");
-        Query query = databaseReference.orderByChild("idUserProduct").equalTo(idShop);
-        query.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference = firebaseDatabase.getReference("Product/"+idShop);
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
@@ -213,5 +244,6 @@ public class DetailShop extends AppCompatActivity {
         swipFresh = findViewById(R.id.swipFresh);
         vFaceBook_DetailShop = findViewById(R.id.vFaceBook_DetailShop);
         tvLinkFacebook_DetailShop = findViewById(R.id.tvLinkFacebook_DetailShop);
+        rcvMyVoucher_Shop = findViewById(R.id.rcvMyVoucher_Shop);
     }
 }

@@ -32,6 +32,7 @@ import com.example.duankhachhang.CartCustomer;
 import com.example.duankhachhang.Class.Category;
 import com.example.duankhachhang.Class.Customer;
 import com.example.duankhachhang.Class.ProductData;
+import com.example.duankhachhang.Dialog.MyVoucherCustomerDialogFragment;
 import com.example.duankhachhang.R;
 import com.example.duankhachhang.RecyclerView.CategoryProduct_Adapter;
 import com.example.duankhachhang.RecyclerView.CategoryProduct_ViewHolder;
@@ -56,12 +57,12 @@ public class Fragment_home_screenHome extends Fragment {
     //    Biến lưu giữ thông tin người dùng app
     private Customer customer = new Customer();
     //    khai bao biến giao diện
-    TextView tvCountProductCart_FragmentHome, tvCountNotification_FragmentHome;
+    TextView tvCountProductCart_FragmentHome, tvCountNotification_FragmentHome,tvCountVoucher;
     TextInputEditText edtSearch_FragmentHome;
     Context context;
     ViewPager viewPagerProductBanner_Home;
     RecyclerView rcvProductList_Home, rcvCategory_Product;
-    FrameLayout vCountCartCustomer_FragmentHome;
+    FrameLayout vCountCartCustomer_FragmentHome,vCountVoucherCustomer;
     SwipeRefreshLayout swipRefresh_FragmentHome;
 
     //    Khai báo biến quản lý
@@ -69,6 +70,7 @@ public class Fragment_home_screenHome extends Fragment {
     private int locationUrlImageProduct_ItemViewPager = 0;
     private int timeDeplay = 2000;
     private int countProductInCart = 0;
+    private int countVoucher = 0;
     private final Handler handler = new Handler();
     private int positionCategorySelection = -1;
     ProductBanerAdapter productBanerAdapter;
@@ -117,16 +119,45 @@ public class Fragment_home_screenHome extends Fragment {
         getCategory();
 //        set title số lượng sản phẩm giỏ hàng
         setCountProductCartUser();
+        getCountVoucher();
 //        gọi hàm bắt sự kiện
         setEvent();
 //        tự động đổi banner
         handler.postDelayed(runnable, timeDeplay);
         return view;
     }
+    private void getCountVoucher(){
+        countVoucher = 0;
+        databaseReference = firebaseDatabase.getReference("VoucherCustomer/"+customer.getId());
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    for (DataSnapshot item:snapshot.getChildren()){
+                        countVoucher ++;
+                    }
+                    if (countVoucher > 0){
+                        tvCountProductCart_FragmentHome.setVisibility(View.VISIBLE);
+                        tvCountVoucher.setText(countVoucher + "");
+                    }
+                }
+                else {
+                    tvCountVoucher.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
 
     @Override
     public void onResume() {
         super.onResume();
+        handler.removeCallbacks(runnable);
+        handler.postDelayed(runnable, timeDeplay);
     }
 
     //    hàm lấy số lượng sản phẩm trong giỏ hàng --- người dùng
@@ -326,6 +357,14 @@ public class Fragment_home_screenHome extends Fragment {
                 return false;
             }
         });
+//        bắt sự kiện nhấn vào voucher
+        vCountVoucherCustomer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                MyVoucherCustomerDialogFragment myVoucherCustomerDialogFragment = new MyVoucherCustomerDialogFragment();
+                myVoucherCustomerDialogFragment.show(getActivity().getSupportFragmentManager(), "Voucher");
+            }
+        });
 
     }
 
@@ -406,6 +445,8 @@ public class Fragment_home_screenHome extends Fragment {
         swipRefresh_FragmentHome = view.findViewById(R.id.swipRefresh_FragmentHome);
         edtSearch_FragmentHome = view.findViewById(R.id.edtSearch_FragmentHome);
         rcvCategory_Product = view.findViewById(R.id.rcvCategory_Product);
+        vCountVoucherCustomer = view.findViewById(R.id.vCountVoucherCustomer);
+        tvCountVoucher = view.findViewById(R.id.tvCountVoucher);
     }
 
 

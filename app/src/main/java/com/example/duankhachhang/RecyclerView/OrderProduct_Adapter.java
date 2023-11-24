@@ -32,12 +32,18 @@ import java.util.ArrayList;
 public class OrderProduct_Adapter extends RecyclerView.Adapter<OrderProduct_ViewHolder> {
     private ArrayList<OrderData> arrOrderData = new ArrayList<>();
     private Context context;
+    OrderProduct_Adapter.SetQuanlityProduct setQuanlityProduct;
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     DatabaseReference databaseReference;
 
-    public OrderProduct_Adapter(ArrayList<OrderData> arrOrderData, Context context){
+    public interface SetQuanlityProduct{
+        public void getQuanlytiProduct(int price,int positon,int quanlity);
+    }
+
+    public OrderProduct_Adapter(ArrayList<OrderData> arrOrderData, Context context,OrderProduct_Adapter.SetQuanlityProduct setQuanlityProduct){
         this.arrOrderData = arrOrderData;
         this.context = context;
+        this.setQuanlityProduct =setQuanlityProduct;
     }
     @NonNull
     @Override
@@ -56,9 +62,9 @@ public class OrderProduct_Adapter extends RecyclerView.Adapter<OrderProduct_View
          public void onClick(View view) {
              EditQuanlityItemOrderProductDialogFragment.EditQuanlityOrderProductItem editQuanlityOrderProductItem = new EditQuanlityItemOrderProductDialogFragment.EditQuanlityOrderProductItem() {
                  @Override
-                 public int getQuanlityOrderProductItem(int quanlityOrderProductItem) {
+                 public void getQuanlityOrderProductItem(int quanlityOrderProductItem) {
                      if (quanlityOrderProductItem > 0){
-                         databaseReference = firebaseDatabase.getReference("Product/"+orderData.getIdProduct_Order());
+                         databaseReference = firebaseDatabase.getReference("Product/"+orderData.getIdShop_Order()+"/"+orderData.getIdProduct_Order());
                          databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                              @Override
                              public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -68,6 +74,8 @@ public class OrderProduct_Adapter extends RecyclerView.Adapter<OrderProduct_View
                                          orderData.setQuanlity_Order(quanlityOrderProductItem);
                                          holder.tvQuanlityProduct_OrderProduct.setText("Số lượng: "+ orderData.getQuanlity_Order());
                                          Toast.makeText(context,"Thay đổi số lượng sản phẩm thành công", Toast.LENGTH_SHORT).show();
+                                         int price = productData.getPriceProduct()*quanlityOrderProductItem;
+                                         setQuanlityProduct.getQuanlytiProduct(price,holder.getAdapterPosition(),quanlityOrderProductItem);
                                      }
                                      else {
                                          AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -92,7 +100,6 @@ public class OrderProduct_Adapter extends RecyclerView.Adapter<OrderProduct_View
                              }
                          });
                      }
-                     return 0;
                  }
              };
              EditQuanlityItemOrderProductDialogFragment editQuanlityItemOrderProductDialogFragment = new EditQuanlityItemOrderProductDialogFragment(editQuanlityOrderProductItem);
