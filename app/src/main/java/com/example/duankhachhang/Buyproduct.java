@@ -234,7 +234,6 @@ public class Buyproduct extends AppCompatActivity {
     }
 
     private void pushDataOrderToFirebase() {
-        System.out.println("po:" + positionOrderAdd);
         OrderData itemOrder = arrOrderData.get(positionOrderAdd);
         if (changeDeliveryAddress) {
             itemOrder.setDeliveryAddress(tvAddressUser_OrderProduct.getText().toString());
@@ -491,8 +490,6 @@ public class Buyproduct extends AppCompatActivity {
         tvVoucher_OrderProduct = findViewById(R.id.tvVoucher_OrderProduct);
         rcvOrderList_OrderProduct = findViewById(R.id.rcvOrderList_OrderProduct);
         edtNote_OrderProduct = findViewById(R.id.edtNote_OrderProduct);
-        vDontVoucher_OrderProduct = findViewById(R.id.vDontVoucher_OrderProduct);
-        spSelectedVocher_OrderProduct = findViewById(R.id.spSelectedVocher_OrderProduct);
         tvSumMoney_OrderProduct = findViewById(R.id.tvSumMoney_OrderProduct);
         btnPay_OrderProduct = findViewById(R.id.btnPay_OrderProduct);
         ivEditDeliveryAddress = findViewById(R.id.ivEditDeliveryAddress);

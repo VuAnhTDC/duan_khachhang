@@ -69,6 +69,7 @@ public class OrderItem_Adaper extends RecyclerView.Adapter<OrderItem_ViewHolder>
                                 ProductData productData = snapshot.getValue(ProductData.class);
                                 Intent intent = new Intent(context, Detailproduct.class);
                                 intent.putExtra("Product", productData);
+                                intent.putExtra("idVoucher","");
                                 context.startActivity(intent);
                             }
                             else {

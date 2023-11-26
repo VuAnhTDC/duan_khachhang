@@ -24,12 +24,16 @@ import com.example.duankhachhang.Class.Customer;
 import com.example.duankhachhang.Class.OrderData;
 import com.example.duankhachhang.Class.ProductData;
 import com.example.duankhachhang.Class.ShopData;
+import com.example.duankhachhang.Class.Voucher;
+import com.example.duankhachhang.Class.VoucherCustomer;
 import com.example.duankhachhang.RecyclerView.CommentProduct_Adapter;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
@@ -90,11 +94,59 @@ public class InputCommentProduct extends AppCompatActivity {
                             public void onSuccess(Void unused) {
 //                                làm rỗng giá trị edt commnent
                                 edtCmtUser.setText("");
+                                getVoucherShop(orderData.getIdShop_Order(),orderData.getIdProduct_Order());
                             }
                         });
                     }
                 }
                 return false;
+            }
+        });
+    }
+
+    private void getVoucherShop(String idProduct,String idShop){
+        databaseReference = firebaseDatabase.getReference("Voucher/"+idShop+"/"+idProduct);
+        Query query = databaseReference.orderByChild("idActionToGetVoucher").equalTo("action3");
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()){
+                    for (DataSnapshot itemSnap:
+                         snapshot.getChildren()) {
+                        Voucher voucher = itemSnap.getValue(Voucher.class);
+                        DatabaseReference databaseReference1 = firebaseDatabase.getReference("VoucherCustomer/"+customer.getId()+"/"+voucher.getIdVoucher());
+                        databaseReference1.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if(!snapshot.exists()){
+                                    VoucherCustomer voucherCustomer = new VoucherCustomer(voucher.getIdVoucher(),voucher.getIdShop(),voucher.getIdProduct(),true);
+                                    databaseReference1.setValue(voucherCustomer).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            voucher.setMaxCountUser(voucher.getMaxCountUser()-1);
+                                            databaseReference.setValue(voucher).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    databaseReference1.removeValue();
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
     }

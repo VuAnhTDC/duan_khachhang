@@ -127,45 +127,6 @@
                             android:paddingVertical="5dp" />
                     </com.google.android.material.textfield.TextInputLayout>
 
-                    <FrameLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <LinearLayout
-                            android:id="@+id/vDontVoucher_OrderProduct"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="20dp"
-                            android:layout_marginTop="10dp"
-                            android:background="@drawable/bg_container_02"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="Voucher"
-                                android:textColor="#000"
-                                android:textSize="20dp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:gravity="right"
-                                android:text="Không có voucher nào"
-                                android:textStyle="italic" />
-                        </LinearLayout>
-
-                        <Spinner
-                            android:id="@+id/spSelectedVocher_OrderProduct"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginHorizontal="20dp"
-                            android:layout_marginTop="10dp"
-                            android:background="@drawable/bg_container_02"
-                            android:visibility="gone" />
-                    </FrameLayout>
-
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -227,7 +188,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:text="Tổng tiền hàng"
+                                android:text="Tiền sản phẩm"
                                 android:textColor="#000"
                                 android:textSize="15dp"
                                 android:textStyle="bold" />

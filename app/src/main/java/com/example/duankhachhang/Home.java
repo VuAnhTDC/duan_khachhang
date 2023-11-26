@@ -107,14 +107,16 @@
 
     //    hàm load Fragment ===> tham số truyền vào là một Fragment cần load
         private void loadingFragment(Fragment fragmentLoading){
-    //        Lấy đối tượng Fragment hiện tại để bắt đầu đổi Fragment
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-    //        Thay thế Fragment có id (Fragment hiện tại) ===> Fragment cần load
-            fragmentTransaction.replace(framelayout_screenhome.getId(),fragmentLoading);
-    //        thiết lập Fragment không có nút quay lại
-            fragmentTransaction.addToBackStack(null);
-    //        load Fragment mới
-            fragmentTransaction.commit();
+            // Kiểm tra xem Fragment đã được thêm vào Back Stack hay chưa
+            Fragment existingFragment = getSupportFragmentManager().findFragmentById(framelayout_screenhome.getId());
+
+            if (existingFragment == null || !existingFragment.getClass().getName().equals(fragmentLoading.getClass().getName())) {
+                // Fragment chưa được thêm vào Back Stack hoặc là một Fragment khác, thì thực hiện thay thế
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(framelayout_screenhome.getId(), fragmentLoading);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
         }
 
     //    hàm lấy danh sách product database

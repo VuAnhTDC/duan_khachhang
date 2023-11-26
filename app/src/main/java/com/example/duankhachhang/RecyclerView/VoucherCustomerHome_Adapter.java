@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.duankhachhang.Buyproduct;
 import com.example.duankhachhang.Class.ActionToGetVoucher;
 import com.example.duankhachhang.Class.Customer;
+import com.example.duankhachhang.Class.PercentDiscount;
 import com.example.duankhachhang.Class.ProductData;
 import com.example.duankhachhang.Class.Voucher;
 import com.example.duankhachhang.Class.VoucherCustomer;
@@ -24,10 +25,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 
-public class VoucherCustomerHome_Adapter extends RecyclerView.Adapter<VoucherItemDetailShop_ViewHolder> {
+public class VoucherCustomerHome_Adapter extends RecyclerView.Adapter<VoucherCustomerHome_ViewHolder> {
 
     private ArrayList<Voucher> arrVoucher = new ArrayList<>();
     private Context context;
@@ -44,34 +48,28 @@ public class VoucherCustomerHome_Adapter extends RecyclerView.Adapter<VoucherIte
 
     @NonNull
     @Override
-    public VoucherItemDetailShop_ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new VoucherItemDetailShop_ViewHolder(LayoutInflater.from(context).inflate(R.layout.customer_item_voucher,parent,false));
+    public VoucherCustomerHome_ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return new VoucherCustomerHome_ViewHolder(LayoutInflater.from(context).inflate(R.layout.customer_item_customervoucher,parent,false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull VoucherItemDetailShop_ViewHolder holder, int position) {
-        Voucher voucher = arrVoucher.get(position);
-        setInformationProduct(voucher.getIdProduct(),voucher.getIdShop(),holder);
-        getActionToGetVoucher(voucher.getIdActionToGetVoucher(),holder);
-        holder.itemVoucherCode_CustomerItemVoucher.setText(voucher.getIdVoucher());
-        if (position % 2 == 0){
-            holder.itemView.setBackgroundResource(R.drawable.bg_item01);
-        }
-        else {
-            holder.itemView.setBackgroundResource(R.drawable.bg_item02);
-        }
+    public void onBindViewHolder(@NonNull VoucherCustomerHome_ViewHolder holder, int position) {
+        Voucher itemVoucher = arrVoucher.get(position);
+        getPercentVoucher(itemVoucher,holder);
+        holder.itemView.setBackgroundResource(R.drawable.bg_container_dialog);
+        getInformationProduct(itemVoucher.getIdProduct(),itemVoucher.getIdShop(),holder,itemVoucher.getIdItemPercentDiscount());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Product/"+voucher.getIdShop()+"/"+voucher.getIdProduct());
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Product/"+itemVoucher.getIdShop()+"/"+itemVoucher.getIdProduct());
                 databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.exists()){
+                        if(snapshot.exists()){
                             ProductData productData = snapshot.getValue(ProductData.class);
                             Intent intent = new Intent(context, Detailproduct.class);
                             intent.putExtra("Product",productData);
-                            intent.putExtra("idVoucher",voucher.getIdVoucher());
+                            intent.putExtra("idVoucher",itemVoucher.getIdVoucher());
                             context.startActivity(intent);
                         }
                     }
@@ -81,21 +79,57 @@ public class VoucherCustomerHome_Adapter extends RecyclerView.Adapter<VoucherIte
 
                     }
                 });
-
             }
         });
 
     }
 
-    //    hàm lấy hành động để được voucher
-    private void getActionToGetVoucher(String idAction, VoucherItemDetailShop_ViewHolder holder){
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("TakeActionToGetVoucher/" +idAction);
+//    hàm lấy thông tin sản phẩm
+    private void getInformationProduct(String idProduct,String idShop,VoucherCustomerHome_ViewHolder holder, String keyPercent){
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Product/"+idShop +"/"+idProduct);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()){
-                    ActionToGetVoucher actionToGetVoucher = snapshot.getValue(ActionToGetVoucher.class);
-                    holder.tvAction_CustomerItemVoucher.setText(actionToGetVoucher.getValueAction());
+                    ProductData productData = snapshot.getValue(ProductData.class);
+                    holder.tvNameProduct_ItemProductVoucher.setText(productData.getNameProduct());
+                    Locale locale = new Locale("vi", "VN");
+                    NumberFormat numberFormatVND = NumberFormat.getCurrencyInstance(locale);
+                    holder.tvPridceProductBeforVoucher.setText(numberFormatVND.format(productData.getPriceProduct()));
+
+                    DatabaseReference databaseReference1 = FirebaseDatabase.getInstance().getReference("ImageProducts/"+productData.getIdProduct()+"/1");
+                    databaseReference1.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()){
+                                String url = snapshot.child("urlImage").getValue().toString();
+                                Picasso.get().load(url).placeholder(R.drawable.icondowload).into(holder.ivProduct_ItemProductVoucher);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+
+                    DatabaseReference databaseReference2 = FirebaseDatabase.getInstance().getReference("PercentVoucher/"+keyPercent);
+                    databaseReference2.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()){
+                                PercentDiscount percentDiscount = snapshot.getValue(PercentDiscount.class);
+                                System.out.println("percent: " + percentDiscount.toString());
+                                holder.tvPridceProductAfterVoucher.setText(numberFormatVND.format(productData.getPriceProduct() - (productData.getPriceProduct()* percentDiscount.getPercent()/100)));
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+
                 }
             }
 
@@ -105,15 +139,15 @@ public class VoucherCustomerHome_Adapter extends RecyclerView.Adapter<VoucherIte
             }
         });
     }
-
-    private void setInformationProduct(String idProduct,String idShop, VoucherItemDetailShop_ViewHolder holder){
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Product/"+idShop+"/"+idProduct);
+//    hàm lấy thông tin percent voucher
+    private void getPercentVoucher(Voucher voucher,VoucherCustomerHome_ViewHolder holder){
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("PercentVoucher/"+voucher.getIdItemPercentDiscount());
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()){
-                    ProductData productData= snapshot.getValue(ProductData.class);
-                    holder.idProduct_CustomerItemVoucher.setText("Mã sản phẩm áp dụng: "+ productData.getIdProduct());
+                    PercentDiscount percentDiscount = snapshot.getValue(PercentDiscount.class);
+                    holder.tvTitleItemVoucher.setText("Giảm giá "+percentDiscount.getPercent() +"%");
                 }
             }
 
@@ -123,7 +157,6 @@ public class VoucherCustomerHome_Adapter extends RecyclerView.Adapter<VoucherIte
             }
         });
     }
-
     @Override
     public int getItemCount() {
         return arrVoucher.size();

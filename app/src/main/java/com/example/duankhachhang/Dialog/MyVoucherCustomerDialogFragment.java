@@ -44,7 +44,7 @@ public class MyVoucherCustomerDialogFragment extends DialogFragment {
         String jsonShop = sharedPreferences.getString("informationUserCustomer", "");
         Gson gson = new Gson();
         customer = gson.fromJson(jsonShop, Customer.class);
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),R.style.TransparentDialog);
         viewDialog = LayoutInflater.from(getActivity()).inflate(R.layout.customer_dialogframent_customervoucher,null);
         voucherCustomerHomeAdapter = new VoucherCustomerHome_Adapter(arrVoucher,getContext());
         rcvCutomerVoucher_Dialog = viewDialog.findViewById(R.id.rcvCutomerVoucher_Dialog);
@@ -96,6 +96,5 @@ public class MyVoucherCustomerDialogFragment extends DialogFragment {
         int width = getResources().getDimensionPixelSize(R.dimen.dialog_width); // Sử dụng giá trị kích thước từ resources
         int height = getResources().getDimensionPixelSize(R.dimen.dialog_height);
         getDialog().getWindow().setLayout(width,height);
-        getDialog().getWindow().setBackgroundDrawableResource(R.drawable.bg_container_dialog);
     }
 }

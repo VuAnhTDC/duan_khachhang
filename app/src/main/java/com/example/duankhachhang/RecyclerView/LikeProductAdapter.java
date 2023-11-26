@@ -63,6 +63,7 @@ public class LikeProductAdapter extends RecyclerView.Adapter<LikeProductViewHold
                             ProductData productData = snapshot.getValue(ProductData.class);
                             Intent intent = new Intent(context, Detailproduct.class);
                             intent.putExtra("Product", productData);
+                            intent.putExtra("idVoucher", "");
                             context.startActivity(intent);
                         }
                     }

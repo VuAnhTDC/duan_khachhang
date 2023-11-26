@@ -57,7 +57,6 @@ public class VoucherItemDetailShop_Adapter extends RecyclerView.Adapter<VoucherI
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()){
                     ActionToGetVoucher actionToGetVoucher = snapshot.getValue(ActionToGetVoucher.class);
-                    holder.tvAction_CustomerItemVoucher.setText(actionToGetVoucher.getValueAction());
                 }
             }
 

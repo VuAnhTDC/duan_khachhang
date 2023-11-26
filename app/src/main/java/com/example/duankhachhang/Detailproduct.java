@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -36,6 +37,7 @@ import com.example.duankhachhang.Class.Customer;
 import com.example.duankhachhang.Class.Image;
 import com.example.duankhachhang.Class.LikeProductData;
 import com.example.duankhachhang.Class.OrderData;
+import com.example.duankhachhang.Class.PercentDiscount;
 import com.example.duankhachhang.Class.ProductData;
 import com.example.duankhachhang.Class.ShopData;
 import com.example.duankhachhang.Class.Voucher;
@@ -73,7 +75,7 @@ public class Detailproduct extends AppCompatActivity {
     ViewPager viewPagerImageProduct_DetailProduct;
     ImageView ivChatShop_DetailProduct, ivLikeProduct_DetailProduct;
     CircleImageView ivAvataShop_DetailProduct;
-    TextView tvNameProduct_DetailProduct, tvPriceProduct_DetailProduct, tvquanlityProduct_DetailProduct, tvDescriptionProduct_DetailProduct, tvQuanlityLike_DetailProduct, tvQuanlityCmt_DetailProduct;
+    TextView tvNameProduct_DetailProduct, tvPriceProduct_DetailProduct, tvquanlityProduct_DetailProduct, tvDescriptionProduct_DetailProduct, tvQuanlityLike_DetailProduct, tvQuanlityCmt_DetailProduct,tvProceProductHaveVoucher;
     Button btnBuyProduct_DetailProduct, btnAddCart_DetailProduct;
     LinearLayout vAvataShop_DetailProduct, vSumlike_DetailProduct, vSumCmt_DetailProduct;
 
@@ -227,6 +229,42 @@ public class Detailproduct extends AppCompatActivity {
                 }
             };
             sensorManager.registerListener(sensorEventListener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+        if (!idVoucher.isEmpty()){
+            databaseReference = firebaseDatabase.getReference("Voucher/"+productData.getIdUserProduct()+"/"+productData.getIdProduct()+"/"+idVoucher);
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()){
+                        Voucher voucher = snapshot.getValue(Voucher.class);
+                        databaseReference = firebaseDatabase.getReference("PercentVoucher/"+voucher.getIdItemPercentDiscount());
+                        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()){
+                                    PercentDiscount percentDiscount = snapshot.getValue(PercentDiscount.class);
+                                    Locale locale = new Locale("vi", "VN");
+                                    NumberFormat numberFormatVND = NumberFormat.getCurrencyInstance(locale);
+                                    tvProceProductHaveVoucher.setText(numberFormatVND.format(productData.getPriceProduct() - (productData.getPriceProduct()*percentDiscount.getPercent()/100)));
+                                    tvProceProductHaveVoucher.setVisibility(View.VISIBLE);
+                                    tvPriceProduct_DetailProduct.setPaintFlags(tvPriceProduct_DetailProduct.getPaintFlags()| Paint.STRIKE_THRU_TEXT_FLAG);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
         }
     }
 
@@ -401,6 +439,7 @@ public class Detailproduct extends AppCompatActivity {
         ivLikeProduct_DetailProduct = findViewById(R.id.ivLikeProduct_DetailProduct);
         ivAvataShop_DetailProduct = findViewById(R.id.ivAvataShop_DetailProduct);
         rcvRelatedProducts = findViewById(R.id.rcvRelatedProducts);
+        tvProceProductHaveVoucher = findViewById(R.id.tvProceProductHaveVoucher);
     }
 
     //    hàm bắt sự kiện
@@ -616,7 +655,7 @@ public class Detailproduct extends AppCompatActivity {
                         if (task.isSuccessful() && task.getResult() != null) {
                             String fcmToken = task.getResult();
                             SendNotification.setContext(context);
-                            SendNotification.getSendNotificationOrderSuccessFull(fcmToken, "Thốn báo Voucher", "Bạn được một voucher có mã " +voucher.getIdVoucher(), NotificationType.NotificationOrder());
+                            SendNotification.getSendNotificationOrderSuccessFull(fcmToken, "Thông báo Voucher", "Bạn được một voucher có mã " +voucher.getIdVoucher(), NotificationType.NotificationOrder());
                         } else {
                             System.out.println("Không lấy và lưu được fcm token");
                         }

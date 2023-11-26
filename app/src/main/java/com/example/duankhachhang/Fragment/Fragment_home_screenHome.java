@@ -9,6 +9,8 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,11 +34,14 @@ import com.example.duankhachhang.CartCustomer;
 import com.example.duankhachhang.Class.Category;
 import com.example.duankhachhang.Class.Customer;
 import com.example.duankhachhang.Class.ProductData;
+import com.example.duankhachhang.Class.Voucher;
+import com.example.duankhachhang.Class.VoucherCustomer;
 import com.example.duankhachhang.Dialog.MyVoucherCustomerDialogFragment;
 import com.example.duankhachhang.R;
 import com.example.duankhachhang.RecyclerView.CategoryProduct_Adapter;
 import com.example.duankhachhang.RecyclerView.CategoryProduct_ViewHolder;
 import com.example.duankhachhang.RecyclerView.ProductListHome_Adapter;
+import com.example.duankhachhang.RecyclerView.ProductSuggestedResultValueSearch_Adapter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
@@ -61,7 +66,7 @@ public class Fragment_home_screenHome extends Fragment {
     TextInputEditText edtSearch_FragmentHome;
     Context context;
     ViewPager viewPagerProductBanner_Home;
-    RecyclerView rcvProductList_Home, rcvCategory_Product;
+    RecyclerView rcvProductList_Home, rcvCategory_Product,rcvResultSearch_FragmentHome;
     FrameLayout vCountCartCustomer_FragmentHome,vCountVoucherCustomer;
     SwipeRefreshLayout swipRefresh_FragmentHome;
 
@@ -77,8 +82,10 @@ public class Fragment_home_screenHome extends Fragment {
     ArrayList<ProductData> arrProduct;
     ArrayList<String> arrUrlBanner;
     ArrayList<Category> arrCategory = new ArrayList<>();
+    ArrayList<ProductData> arrProductSuggestedResult_ValueSearch = new ArrayList<>();
     ProductListHome_Adapter productListHomeAdapter;
     CategoryProduct_Adapter categoryProductAdapter;
+    ProductSuggestedResultValueSearch_Adapter productSuggestedResultValueSearchAdapter;
     FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     DatabaseReference databaseReference;
     private View view;
@@ -127,22 +134,29 @@ public class Fragment_home_screenHome extends Fragment {
         return view;
     }
     private void getCountVoucher(){
-        countVoucher = 0;
         databaseReference = firebaseDatabase.getReference("VoucherCustomer/"+customer.getId());
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                countVoucher = 0;
                 if (snapshot.exists()){
                     for (DataSnapshot item:snapshot.getChildren()){
-                        countVoucher ++;
+                        VoucherCustomer voucherCustomer = item.getValue(VoucherCustomer.class);
+                        System.out.println("Voucher: " + voucherCustomer.isStatus());
+                        if (voucherCustomer.isStatus()){
+                            countVoucher ++;
+                        }
                     }
                     if (countVoucher > 0){
-                        tvCountProductCart_FragmentHome.setVisibility(View.VISIBLE);
+                        tvCountVoucher.setVisibility(View.VISIBLE);
                         tvCountVoucher.setText(countVoucher + "");
                     }
+                    else {
+                        tvCountVoucher.setVisibility(View.GONE);
+                    }
                 }
-                else {
-                    tvCountVoucher.setVisibility(View.GONE);
+              else {
+                  tvCountVoucher.setVisibility(View.GONE);
                 }
             }
 
@@ -241,6 +255,11 @@ public class Fragment_home_screenHome extends Fragment {
         categoryProductAdapter = new CategoryProduct_Adapter(arrCategory, context, buttonCategorySelection);;
         rcvCategory_Product.setLayoutManager(new LinearLayoutManager(context,LinearLayoutManager.HORIZONTAL,false));
         rcvCategory_Product.setAdapter(categoryProductAdapter);
+
+//        gán giá trị cho productSuggestedResultAdapter
+        productSuggestedResultValueSearchAdapter = new ProductSuggestedResultValueSearch_Adapter(arrProductSuggestedResult_ValueSearch,context);
+        rcvResultSearch_FragmentHome.setLayoutManager(new LinearLayoutManager(context));
+        rcvResultSearch_FragmentHome.setAdapter(productSuggestedResultValueSearchAdapter);
     }
 
     //    hàm lấy danh sách category
@@ -347,16 +366,6 @@ public class Fragment_home_screenHome extends Fragment {
                 getProductData();
             }
         });
-        edtSearch_FragmentHome.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                if (i == EditorInfo.IME_ACTION_DONE) {
-//                    System.out.println(edtSearch_FragmentHome.getText().toString());
-//                    searchProduct();
-                }
-                return false;
-            }
-        });
 //        bắt sự kiện nhấn vào voucher
         vCountVoucherCustomer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -365,7 +374,45 @@ public class Fragment_home_screenHome extends Fragment {
                 myVoucherCustomerDialogFragment.show(getActivity().getSupportFragmentManager(), "Voucher");
             }
         });
+        edtSearch_FragmentHome.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (edtSearch_FragmentHome.getText().toString().length() > 0){
+                    rcvResultSearch_FragmentHome.setVisibility(View.VISIBLE);
+                    getSuggestedResult(edtSearch_FragmentHome.getText().toString());
+                }
+                else {
+                    rcvResultSearch_FragmentHome.setVisibility(View.GONE);
+                }
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+    }
+
+//    Hiển thị sản phẩm gợi ý theo từ khóa người dùng nhập vào
+    private void getSuggestedResult(String valueSearch){
+        arrProductSuggestedResult_ValueSearch.clear();
+        for (ProductData itemProduct:
+             arrProduct) {
+            if (itemProduct.getNameProduct().toLowerCase().contains(valueSearch)){
+                arrProductSuggestedResult_ValueSearch.add(itemProduct);
+                productSuggestedResultValueSearchAdapter.notifyDataSetChanged();
+            }
+        }
+        if (arrProductSuggestedResult_ValueSearch.size() < 1){
+            rcvResultSearch_FragmentHome.setVisibility(View.GONE);
+        }
     }
 
     private void getProductWithCategory(String idCategory) {
@@ -447,6 +494,7 @@ public class Fragment_home_screenHome extends Fragment {
         rcvCategory_Product = view.findViewById(R.id.rcvCategory_Product);
         vCountVoucherCustomer = view.findViewById(R.id.vCountVoucherCustomer);
         tvCountVoucher = view.findViewById(R.id.tvCountVoucher);
+        rcvResultSearch_FragmentHome = view.findViewById(R.id.rcvResultSearch_FragmentHome);
     }
 
 

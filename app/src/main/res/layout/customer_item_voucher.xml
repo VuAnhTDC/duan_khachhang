@@ -2,54 +2,53 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="90dp"
-    android:gravity="center_vertical"
     android:layout_marginTop="5dp"
+    android:gravity="center_vertical"
     android:orientation="vertical">
-    <LinearLayout
+
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="5dp"
-        android:id="@+id/linearLayout_VoucherItem">
+        android:layout_height="wrap_content">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_gravity="center">
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
             <TextView
                 android:id="@+id/itemVoucherCode_CustomerItemVoucher"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
+                android:text="Ma giam gia"
                 android:textColor="#000"
                 android:textSize="18dp"
-                android:textStyle="bold"
-                android:text="Ma giam gia"
-                />
+                android:textStyle="bold" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_marginHorizontal="20dp"
-                >
-               <TextView
-                   android:id="@+id/idProduct_CustomerItemVoucher"
-                   android:layout_width="match_parent"
-                   android:layout_height="wrap_content"
-                   android:maxLines="2"
-                   android:ellipsize="end"
-                   android:text="ma sp"
-                   />
+                android:orientation="vertical">
+
                 <TextView
-                    android:id="@+id/tvAction_CustomerItemVoucher"
+                    android:id="@+id/idProduct_CustomerItemVoucher"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Thich 3 san pham"
-                    />
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:text="ma sp" />
             </LinearLayout>
         </LinearLayout>
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:layout_gravity="right"
+            android:layout_marginRight="5dp"
+            android:src="@drawable/icon_voucher"
+            />
+    </FrameLayout>
 
-    </LinearLayout>
 
 </LinearLayout>

@@ -154,6 +154,18 @@
                     android:textColor="#D60E0E"
                     android:textSize="20dp"
                     android:textStyle="bold|italic" />
+                <TextView
+                    android:id="@+id/tvProceProductHaveVoucher"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="20dp"
+                    android:gravity="right"
+                    android:text="1000000 VND"
+                    android:textColor="#D60E0E"
+                    android:textSize="20dp"
+                    android:textStyle="bold|italic"
+                    />
 
                 <TextView
                     android:id="@+id/tvquanlityProduct_DetailProduct"

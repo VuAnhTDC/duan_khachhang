@@ -140,6 +140,15 @@
                                 android:paddingHorizontal="5dp"
                                 android:paddingVertical="5dp" />
                         </com.google.android.material.textfield.TextInputLayout>
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rcvResultSearch_FragmentHome"
+                            android:layout_marginTop="60dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="180dp"
+                            android:visibility="gone"
+                            android:layout_marginHorizontal="10dp"
+                            android:paddingHorizontal="3dp"
+                            />
                     </FrameLayout>
                     <!--                  Danh sách danh mục-->
                     <androidx.recyclerview.widget.RecyclerView

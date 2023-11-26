@@ -68,7 +68,7 @@ public class CommentProductDialogFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),R.style.TransparentDialog);
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.customer_dialogfragment_commentproduct, null);
         rcvListCommentProduct_CommentProduct = dialogView.findViewById(R.id.rcvListCommentProduct_CommentProduct);
@@ -82,8 +82,8 @@ public class CommentProductDialogFragment extends DialogFragment {
     @Override
     public void onStart() {
         super.onStart();
-        int width = getResources().getDimensionPixelSize(R.dimen.dialog_width); // Sử dụng giá trị kích thước từ resources
-        int height = getResources().getDimensionPixelSize(R.dimen.dialog_height);
+        int width = getResources().getDimensionPixelSize(R.dimen.dialog_width_cmt); // Sử dụng giá trị kích thước từ resources
+        int height = getResources().getDimensionPixelSize(R.dimen.dialog_height_cmt);
         getDialog().getWindow().setLayout(width,height);
     }
 }
