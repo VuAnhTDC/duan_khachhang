@@ -22,8 +22,9 @@
        <androidx.recyclerview.widget.RecyclerView
            android:id="@+id/rcvContent_Message"
            android:paddingHorizontal="5dp"
+           android:layout_gravity="bottom"
            android:layout_width="match_parent"
-           android:layout_height="match_parent"
+           android:layout_height="wrap_content"
            android:layout_marginBottom="60dp"
            />
        <LinearLayout

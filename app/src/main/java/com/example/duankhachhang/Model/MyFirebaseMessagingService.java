@@ -43,22 +43,27 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void sendNotification(String title, String strMessage, String notificationType) {
-        Intent intent = new Intent(this, Fragment_home_screenHome.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder notificationCompat;
         if (notificationType.equals(NotificationType.NotificationNormal())) {
+            Intent intent = new Intent(this, Fragment_home_screenHome.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             notificationCompat = new NotificationCompat.Builder(this, notificationType)
                     .setContentTitle(title)
                     .setContentText(strMessage)
                     .setSmallIcon(R.drawable.icon_product)
                     .setContentIntent(pendingIntent);
         } else if (notificationType.equals("chat")) {
+           Intent intent = new Intent(this, Fragment_message_screenHome.class);
+           PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             notificationCompat = new NotificationCompat.Builder(this, NotificationType.NotificationNormal())
                     .setContentTitle(title)
                     .setContentText(strMessage)
                     .setSmallIcon(R.drawable.icon_chat_notification)
                     .setContentIntent(pendingIntent);
-        } else {
+        }
+        else {
+            Intent intent = new Intent(this, Fragment_message_screenHome.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             notificationCompat = new NotificationCompat.Builder(this, NotificationType.NotificationNormal())
                     .setContentTitle(title)
                     .setContentText(strMessage)

@@ -246,8 +246,21 @@ public class CartCustomer extends AppCompatActivity {
                     for (DataSnapshot itemCart :
                             snapshot.getChildren()) {
                         CartData cartData = itemCart.getValue(CartData.class);
-                        arrCart.add(cartData);
-                        cartCustomerAdapter.notifyDataSetChanged();
+                       DatabaseReference databaseReference1 = firebaseDatabase.getReference("Product/"+cartData.getIdShop()+"/"+cartData.getIdProduct());
+                        databaseReference1.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()){
+                                    arrCart.add(cartData);
+                                    cartCustomerAdapter.notifyDataSetChanged();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
                     }
                 } else {
                     arrCart.clear();

@@ -112,6 +112,7 @@ public class MessageActivity extends AppCompatActivity {
                         messageAdapter.notifyDataSetChanged();
                     }
                     rcvContent_Message.smoothScrollToPosition(messageAdapter.getItemCount() -1);
+
                 }
             }
 

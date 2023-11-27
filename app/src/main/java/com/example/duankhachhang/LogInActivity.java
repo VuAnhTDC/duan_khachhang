@@ -17,7 +17,11 @@ import android.widget.Toast;
 
 import com.example.duankhachhang.Class.Customer;
 import com.example.duankhachhang.Class.ShowMessage;
+import com.example.duankhachhang.Model.NotificationType;
+import com.example.duankhachhang.Model.SendNotification;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -65,7 +69,6 @@ public class LogInActivity extends AppCompatActivity {
         context = this;
         ShowMessage.context = this;
         createChanelNotification();
-        getAndSaveFCMToken();
     }
     private void createChanelNotification(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
@@ -74,14 +77,41 @@ public class LogInActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(notificationChannel);
         }
     }
-    private void getAndSaveFCMToken() {
+    private void getAndSaveFCMToken(Customer customer) {
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(new OnCompleteListener<String>() {
                     @Override
                     public void onComplete(@NonNull Task<String> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
-                            String fcmToken = task.getResult();
-                            System.out.println("fcmtoken: " + fcmToken);
+                            customer.setFcmToken(task.getResult());
+                            DatabaseReference databaseReference = firebaseDatabase.getReference("Customer/"+customer.getId());
+                            databaseReference.setValue(customer).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+                                    SharedPreferences shePreferencesCustomer = getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
+                                    SharedPreferences shePreferencesLogin = getSharedPreferences("UserLogin", Context.MODE_PRIVATE);
+                                    SharedPreferences.Editor editCustomer = shePreferencesCustomer.edit();
+                                    SharedPreferences.Editor editLogin = shePreferencesLogin.edit();
+                                    Gson gson = new Gson();
+                                    String json = gson.toJson(customer);
+                                    System.out.println(json.toString());
+                                    editCustomer.putString("informationUserCustomer", json);
+                                    editCustomer.commit();
+                                    editCustomer.apply();
+                                    editLogin.putBoolean("isLogin", isLogin);
+                                    editLogin.commit();
+                                    editLogin.apply();
+                                    Intent intent = new Intent(LogInActivity.this, Home.class);
+                                    intent.putExtra("customer",customer);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    ShowMessage.showMessage(context, "Bị lỗi trong qua trình đăng nhặp. Vui lòng thử lại sau");
+                                }
+                            });
                         } else {
                             System.out.println("Không lấy và lưu được fcm token");
                         }
@@ -208,9 +238,7 @@ public class LogInActivity extends AppCompatActivity {
     private void updateUI(FirebaseUser user) {
         if (user != null){
             String phoneNumber = user.getPhoneNumber();
-            System.out.println("updateUI  phoneNumber: " + phoneNumber);
             String phone = "0"+phoneNumber.substring(3);
-            System.out.println("updateUI  phone: " + phone);
             if (phone != null){
                 reference = firebaseDatabase.getReference("Customer/"+phone);
                 reference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -221,10 +249,6 @@ public class LogInActivity extends AppCompatActivity {
                             Customer customer1 = snapshot.getValue(Customer.class);
 //                            System.out.println("updateUI  customer: " + customer1.toString());
                             saveSharedPreferences(customer1);
-                            Intent intent = new Intent(LogInActivity.this, Home.class);
-                            intent.putExtra("customer",customer1);
-                            startActivity(intent);
-                            finish();
                         }else {
                             System.out.println("updateUI  dữ liệu không tồn tại ");
                             Intent intent = new Intent(LogInActivity.this, EnterInformationActivity.class);
@@ -243,28 +267,7 @@ public class LogInActivity extends AppCompatActivity {
         }
     }
     private void saveSharedPreferences(Customer customer){
-        SharedPreferences shePreferencesCustomer = getSharedPreferences("informationUserCustomer", Context.MODE_PRIVATE);
-        SharedPreferences shePreferencesLogin = getSharedPreferences("UserLogin", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editCustomer = shePreferencesCustomer.edit();
-        SharedPreferences.Editor editLogin = shePreferencesLogin.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(customer);
-        System.out.println(json.toString());
-        editCustomer.putString("informationUserCustomer", json);
-        editCustomer.putString("numberphone", customer.getId());
-        editCustomer.putString("name", customer.getName());
-        editCustomer.putString("image", customer.getImageUser());
-        editCustomer.putString("address", customer.getAddress());
-        editCustomer.commit();
-        editCustomer.apply();
-        editLogin.putBoolean("isLogin", isLogin);
-        editLogin.commit();
-        editLogin.apply();
-        SharedPreferences preferences = getSharedPreferences("myFCMToken", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("fcmToken", customer.getFcmToken());
-        editCustomer.commit();
-        editor.apply();
+        getAndSaveFCMToken(customer);
     }
 
 

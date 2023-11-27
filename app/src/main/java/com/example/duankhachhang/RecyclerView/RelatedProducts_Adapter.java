@@ -69,7 +69,8 @@ public class RelatedProducts_Adapter extends RecyclerView.Adapter<RealtedProduct
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, Detailproduct.class);
-                intent.putExtra("idProduct",productData.getIdProduct());
+                intent.putExtra("Product",productData);
+                intent.putExtra("idVoucher","");
                 context.startActivity(intent);
             }
         });

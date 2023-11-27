@@ -70,8 +70,22 @@ public class MyVoucherCustomerDialogFragment extends DialogFragment {
                           public void onDataChange(@NonNull DataSnapshot snapshot) {
                               if (snapshot.exists()){
                                   Voucher voucher =snapshot.getValue(Voucher.class);
-                                  arrVoucher.add(voucher);
-                                  voucherCustomerHomeAdapter.notifyDataSetChanged();
+                                  DatabaseReference databaseReference1 =  FirebaseDatabase.getInstance().getReference("Product/"+voucher.getIdShop()+"/"+voucher.getIdProduct());
+                                  databaseReference1.addValueEventListener(new ValueEventListener() {
+                                      @Override
+                                      public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                          if (snapshot.exists()){
+                                              arrVoucher.add(voucher);
+                                              voucherCustomerHomeAdapter.notifyDataSetChanged();
+                                          }
+                                      }
+
+                                      @Override
+                                      public void onCancelled(@NonNull DatabaseError error) {
+
+                                      }
+                                  });
+
                               }
                           }
 

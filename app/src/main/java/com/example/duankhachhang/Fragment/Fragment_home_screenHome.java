@@ -31,6 +31,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.example.duankhachhang.Adapter.ProductBanerAdapter;
 import com.example.duankhachhang.CartCustomer;
+import com.example.duankhachhang.Class.CartData;
 import com.example.duankhachhang.Class.Category;
 import com.example.duankhachhang.Class.Customer;
 import com.example.duankhachhang.Class.ProductData;
@@ -94,6 +95,12 @@ public class Fragment_home_screenHome extends Fragment {
     public Fragment_home_screenHome() {
         this.arrProduct = new ArrayList<>();
         this.arrUrlBanner = new ArrayList<>();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
     }
 
     //    hàm thêm Product
@@ -176,29 +183,43 @@ public class Fragment_home_screenHome extends Fragment {
 
     //    hàm lấy số lượng sản phẩm trong giỏ hàng --- người dùng
     private void setCountProductCartUser() {
-        System.out.println("customer: " +customer.toString());
+
 //        Truy cập bảng giỏ hàng vào node người dùng trên firebase
         databaseReference = firebaseDatabase.getReference("CartCustomer/" + customer.getId());
 //        lắng nghe sự kiện
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                countProductInCart = 0;
 //                kiểm tra giỏ hàng người dùng có tồn tại không ---> nếu tồn tại
                 if (snapshot.exists()) {
 //                    gán giá trị biến đếm số lượng sản phẩm trong giỏ hàng người dùng
-                    countProductInCart = 0;
 //                    duyệt danh sách giỏ hàng người dùng
                     for (DataSnapshot itemCart :
                             snapshot.getChildren()) {
-//                        Tăng số lượng biến đếm lên 1 đơn vị
-                        countProductInCart++;
-                    }
-//                    nếu biến đếm số lượng hàng trong giỏ hàng người dùng > 0
-                    if (countProductInCart > 0) {
+                       CartData cartData = itemCart.getValue(CartData.class);
+                       DatabaseReference databaseReference1 = firebaseDatabase.getReference("Product/"+cartData.getIdShop()+"/"+cartData.getIdProduct());
+                        databaseReference1.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                if (snapshot.exists()){
+                                   countProductInCart ++;
+                                   // nếu biến đếm số lượng hàng trong giỏ hàng người dùng > 0
+                                    if (countProductInCart > 0) {
 //                        hiển thị số lượng hàng hóa trong giỏ hàng
-                        tvCountProductCart_FragmentHome.setText(countProductInCart + "");
-                        tvCountProductCart_FragmentHome.setVisibility(View.VISIBLE);
+                                        tvCountProductCart_FragmentHome.setText(countProductInCart + "");
+                                        tvCountProductCart_FragmentHome.setVisibility(View.VISIBLE);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+
+                            }
+                        });
                     }
+//
 
                 }
 //                ngược lại

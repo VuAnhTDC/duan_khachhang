@@ -391,15 +391,17 @@ public class Detailproduct extends AppCompatActivity {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                arrRelatedProducts.clear();
                 for (DataSnapshot itemSnap :
                         snapshot.getChildren()) {
                     if (ao <= count) {
                         for (DataSnapshot item :
                                 itemSnap.getChildren()) {
+                            ProductData productData1 = item.getValue(ProductData.class);
                             if (ao <= count) {
-                                if (item.child("keyCategoryProduct").getKey().toString().equals(keyCategoryProduct)) {
-                                    ProductData productData1 = item.getValue(ProductData.class);
+                                if (productData1.getKeyCategoryProduct().equals(keyCategoryProduct)) {
                                     arrRelatedProducts.add(productData1);
+                                    relatedProductsAdapter.notifyDataSetChanged();
                                     ao++;
                                 }
                             } else {
@@ -618,26 +620,50 @@ public class Detailproduct extends AppCompatActivity {
         });
     }
     private void voucherProduct(Voucher voucher){
+//        kiểm tra xem voucher đó trong coucher customer đã tồn tại chưa
         DatabaseReference databaseReference1 = firebaseDatabase.getReference("VoucherCustomer/"+customer.getId()+"/"+voucher.getIdVoucher());
         databaseReference1.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                Nếu chưa
                 if (!snapshot.exists()){
-                    databaseReference1.setValue(new VoucherCustomer(voucher.getIdVoucher(),voucher.getIdShop(),voucher.getIdProduct(),true)).addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void unused) {
-                            voucher.setMaxCountUser(voucher.getMaxCountUser()-1);
-                            DatabaseReference  databaseReference1 = firebaseDatabase.getReference("Voucher/" + voucher.getIdShop() +"/"+voucher.getIdProduct()+"/"+voucher.getIdVoucher());
-                            databaseReference1.setValue(voucher).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void unused) {
-                                   getAndSaveFCMToken(voucher);
-                                }
-                            });
+//                    kiểm tra xem sản phẩm đó có trồn tại không. Có thể voucher còn nhưng sản phẩm không còn
+                   DatabaseReference databaseReference2 = firebaseDatabase.getReference("Product/"+voucher.getIdShop()+"/"+voucher.getIdProduct());
+                   databaseReference2.addListenerForSingleValueEvent(new ValueEventListener() {
+                       @Override
+                       public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                           nếu sản phẩm còn tồn tại
+                           if (snapshot.exists()){
+//                               Thêm voucher đó cho người dùng
+                               databaseReference1.setValue(new VoucherCustomer(voucher.getIdVoucher(),voucher.getIdShop(),voucher.getIdProduct(),true)).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                   @Override
+                                   public void onSuccess(Void unused) {
+                                       voucher.setMaxCountUser(voucher.getMaxCountUser()-1);
+                                         databaseReference = firebaseDatabase.getReference("Voucher/" + voucher.getIdShop() +"/"+voucher.getIdProduct()+"/"+voucher.getIdVoucher());
+                                       databaseReference.setValue(voucher).addOnSuccessListener(new OnSuccessListener<Void>() {
+//                                          n
+                                           @Override
+                                           public void onSuccess(Void unused) {
+                                               getAndSaveFCMToken(voucher);
+                                           }
+                                       })
+//                                               Nếu chỉnh lại số lượng voucher bị lỗi. Xóa voucher đã thêm thành công trước đó
+                                               .addOnFailureListener(new OnFailureListener() {
+                                           @Override
+                                           public void onFailure(@NonNull Exception e) {
+                                               databaseReference1.removeValue();
+                                           }
+                                       });
+                                   }
+                               });
+                           }
+                       }
 
+                       @Override
+                       public void onCancelled(@NonNull DatabaseError error) {
 
-                        }
-                    });
+                       }
+                   });
                 }
             }
 
