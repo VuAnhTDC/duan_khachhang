@@ -149,17 +149,29 @@ public class Fragment_home_screenHome extends Fragment {
                 if (snapshot.exists()){
                     for (DataSnapshot item:snapshot.getChildren()){
                         VoucherCustomer voucherCustomer = item.getValue(VoucherCustomer.class);
-                        System.out.println("Voucher: " + voucherCustomer.isStatus());
                         if (voucherCustomer.isStatus()){
-                            countVoucher ++;
+                           DatabaseReference databaseReference1 = firebaseDatabase.getReference("Product/"+voucherCustomer.getIdShop()+"/"+voucherCustomer.getIdProduct());
+                           databaseReference1.addListenerForSingleValueEvent(new ValueEventListener() {
+                               @Override
+                               public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                   if (snapshot.exists()){
+                                       countVoucher ++;
+                                       if (countVoucher > 0){
+                                           tvCountVoucher.setVisibility(View.VISIBLE);
+                                           tvCountVoucher.setText(countVoucher + "");
+                                       }
+                                       else {
+                                           tvCountVoucher.setVisibility(View.GONE);
+                                       }
+                                   }
+                               }
+
+                               @Override
+                               public void onCancelled(@NonNull DatabaseError error) {
+
+                               }
+                           });
                         }
-                    }
-                    if (countVoucher > 0){
-                        tvCountVoucher.setVisibility(View.VISIBLE);
-                        tvCountVoucher.setText(countVoucher + "");
-                    }
-                    else {
-                        tvCountVoucher.setVisibility(View.GONE);
                     }
                 }
               else {

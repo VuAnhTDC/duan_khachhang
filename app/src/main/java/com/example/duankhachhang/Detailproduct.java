@@ -124,16 +124,20 @@ public class Detailproduct extends AppCompatActivity {
 
     //    hàm kiểm tra voucher của sản phẩm
     private void getVoucherProduct() {
-        databaseReference = firebaseDatabase.getReference("Voucher/" + productData.getIdUserProduct() + "/" + productData.getIdProduct());
+//        + "/" + productData.getIdProduct()
+        databaseReference = firebaseDatabase.getReference("Voucher/" + productData.getIdUserProduct());
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 arrVoucherProduct.clear();
                 if (snapshot.exists()) {
-                    for (DataSnapshot itemVoucher :
-                            snapshot.getChildren()) {
-                        Voucher voucher = itemVoucher.getValue(Voucher.class);
-                        arrVoucherProduct.add(voucher);
+                    for (DataSnapshot item:
+                         snapshot.getChildren()) {
+                        for (DataSnapshot itemVoucher :
+                                item.getChildren()) {
+                            Voucher voucher = itemVoucher.getValue(Voucher.class);
+                            arrVoucherProduct.add(voucher);
+                        }
                     }
                 }
             }
@@ -622,7 +626,7 @@ public class Detailproduct extends AppCompatActivity {
     private void voucherProduct(Voucher voucher){
 //        kiểm tra xem voucher đó trong coucher customer đã tồn tại chưa
         DatabaseReference databaseReference1 = firebaseDatabase.getReference("VoucherCustomer/"+customer.getId()+"/"+voucher.getIdVoucher());
-        databaseReference1.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference1.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 //                Nếu chưa

@@ -105,7 +105,7 @@ public class InputCommentProduct extends AppCompatActivity {
     }
 
     private void getVoucherShop(String idProduct,String idShop){
-        databaseReference = firebaseDatabase.getReference("Voucher/"+idShop+"/"+idProduct);
+        databaseReference = firebaseDatabase.getReference("Voucher/"+idShop+idProduct);
         Query query = databaseReference.orderByChild("idActionToGetVoucher").equalTo("action3");
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
